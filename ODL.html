@@ -750,7 +750,7 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="initialPage" class="page">
-    <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" alt="Namitete Secondary School Logo" class="logo">
+    <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" alt="Namitete Secondary School Logo" class="logo">
     <h1><p style="font-size:28px;">NAMITETE SECONDARY-ODL</p></h1>
     <h2>EXAM PORTAL</h2>
     <label for="selectedForm">Select Form / Sankhani Kalasi</label>
@@ -779,7 +779,7 @@ function saveSelectedSubjectsToRepo() {
     <button class="back-btn" onclick="handleBriefBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
     <header id="briefReportHeader" style="width: 100%;">
-        <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" class="logo" alt="School Logo">
+        <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
         <div id="briefReportHeaderRight">
             <h3>NAMITETE SECONDARY SCHOOL</h3>
             Private Bag 3, Namitete<br>
@@ -829,7 +829,7 @@ function saveSelectedSubjectsToRepo() {
     <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
     <header id="reportHeader" style="width: 100%;">
-        <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" class="logo" alt="School Logo">
+        <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
         <div id="reportHeaderRight">
             <div style="font-family: 'Times New Roman', Times, serif;">
     <p style="margin:5px 0;"><h3>NAMITETE SECONDARY SCHOOL</h3>
@@ -970,7 +970,7 @@ function saveSelectedSubjectsToRepo() {
         </div>
     </div>
 
-    <button onclick="saveSelectedSubjectsToRepo()">Save All Data to Cloud</button>
+    <button onclick="saveSelectedSubjectsToRepo()">Save All Data</button>
     <button onclick="saveScoresAsExcel()" style="background: #28a745;">Export list as Excel</button>
     <button onclick="openScoreSheetView()">Mark Sheet</button>
     <p style="font-size:11px; margin-top: 15px; color: #e74c3c;">NOTE: Selection automatically loads students. Scores update marksheets in real-time as you type.</p>
@@ -1202,7 +1202,7 @@ function saveSelectedSubjectsToRepo() {
 <script>
 // --- GITHUB CONSTANTS ---
 const GITHUB_USER = 'magawass';
-const GITHUB_REPO = 'n';
+const GITHUB_REPO = 'n2';
 const CONFIG_FILE = 'config.json';
 const ADMIN_PASSWORD = '00n'; // Placeholder for security testing/local use
 
@@ -1244,14 +1244,14 @@ const GRADE_KEY_LOWER = {
     F: 0
 }; // Lower forms use A-F
 const GRADE_KEY_UPPER = {
-    1: 80,
+    1: 85,
     2: 75,
     3: 70,
     4: 65,
     5: 60,
-    6: 55,
+    6: 50,
     7: 45,
-    8: 35,
+    8: 40,
     9: 0
 }; // Upper forms use 1-9 (Aggregate)
 
@@ -2015,8 +2015,8 @@ async function uploadCSV() {
             token,
             'PUT'
         );
-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
-        hideLoading();
+
+      hideLoading();
         if (result) {
             alert(`File ${fileName} uploaded/updated successfully!`);
             currentClassData[form] = null;
