@@ -32,11 +32,11 @@
             }
         }
 
-        // Surgical Fix: Admin content points to 'ui" repo
-        const GITHUB_CONFIG = { owner: "magawass", repo: "ui", path: "data/content.json" };
+        // Surgical Fix: Admin content points to 'n" repo
+        const GITHUB_CONFIG = { owner: "magawass", repo: "n", path: "data/content.json" };
         let adminContent = {
             headerTitle: "WELCOME TO THE OFFICIAL STUDENT PORTAL",
-            headerSub: "EST. 1990 | EXCELLENCE & INTEGRITY",
+            headerSub: "EST. 1990 | HARDWORK EARNS PROSPERITY",
             headerImg: "https://raw.githubusercontent.com/ChikumbutsoLubaini/Teacher-Assistant/main/school_building.jpg",
             announcements: "",
             aboutText: "",
@@ -68,7 +68,7 @@
             document.querySelector('#portalContainer iframe').src = url;
         }
 
-        // --- Data Logic (Sync with magawass/ui) ---
+        // --- Data Logic (Sync with magawass/n) ---
         async function loadContent() {
             try {
                 const rawUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${GITHUB_CONFIG.path}`;
@@ -462,7 +462,7 @@
                         WELCOME TO THE OFFICIAL STUDENT PORTAL
                     </h2>
                     <p id="displayHeaderSub" class="mt-4 text-base md:text-lg font-medium text-white/80 tracking-wide">
-                        EST. 1990 | EXCELLENCE & INTEGRITY
+                        EST. 1990 | HARDWORK EARNS PROSPERITY
                     </p>
                     <div class="mt-8 flex justify-center gap-4">
                         <button onclick="showWelcome()" class="bg-white text-brandBlue px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all hover:shadow-xl">
@@ -568,13 +568,13 @@
             </div>
         </div>
 
-        <!-- Admin Panel (Syncs with magawass/ui) -->
+        <!-- Admin Panel (Syncs with magawass/n) -->
         <div id="adminPanel" class="page py-10 px-6 min-h-screen bg-surface">
             <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-10">
                     <div>
                         <h2 class="text-3xl font-display font-bold text-brandBlue">Content Editor</h2>
-                        <p class="text-gray-500 text-sm mt-1">Synced with UI Repository</p>
+                        <p class="text-gray-500 text-sm mt-1">Synced with n Repository</p>
                     </div>
                     <button onclick="showPage('homePage')" class="flex items-center gap-2 text-gray-500 font-semibold hover:text-brandBlue transition-colors">
                         <i class="fas fa-arrow-left"></i> Back to Site
@@ -667,13 +667,13 @@
             <h2>Welcome to Namitete</h2>
             <p>Your journey to academic excellence begins here. Select an exam portal to continue.</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-                <button onclick="openPortal('https://magawass.github.io/m/brief22_BUTTONS_FIXED.html')" class="action-btn bg-brandBlue text-white px-8 py-4 rounded-xl font-semibold hover:bg-brandBlue/90 transition-all shadow-lg shadow-brandBlue/20 flex items-center justify-center gap-3">
+                <button onclick="openPortal('https://magawass.github.io/n/brief22_BUTTONS_FIXED.html')" class="action-btn bg-brandBlue text-white px-8 py-4 rounded-xl font-semibold hover:bg-brandBlue/90 transition-all shadow-lg shadow-brandBlue/20 flex items-center justify-center gap-3">
                     <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                         <i class="fas fa-calendar-check"></i>
                     </div>
                     EXAMS DAY
                 </button>
-                <button onclick="openPortal('https://magawass.github.io/m/ODL.html')" class="action-btn bg-brandOlive text-white px-8 py-4 rounded-xl font-semibold hover:bg-brandOlive/90 transition-all shadow-lg shadow-brandOlive/20 flex items-center justify-center gap-3">
+                <button onclick="openPortal('https://magawass.github.io/n/ODL.html')" class="action-btn bg-brandOlive text-white px-8 py-4 rounded-xl font-semibold hover:bg-brandOlive/90 transition-all shadow-lg shadow-brandOlive/20 flex items-center justify-center gap-3">
                     <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                         <i class="fas fa-desktop"></i>
                     </div>
@@ -708,7 +708,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start gap-10">
                 <div>
                     <h3 class="text-2xl font-display font-bold text-white mb-3">Namitete Secondary School</h3>
-                    <p class="text-gray-500 text-sm">Excellence in Education Since 1990</p>
+                    <p class="text-gray-500 text-sm">Hardwork earns prosperity 1990</p>
                     <div class="flex gap-4 mt-6">
                         <a href="#" class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors">
                             <i class="fab fa-facebook-f text-white"></i>
