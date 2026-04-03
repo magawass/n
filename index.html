@@ -1,0 +1,755 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Namitete Secondary | Official Portal</title>
+    <!-- Combined Scripts: Tailwind for logic, FontAwesome for icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 
+                        brandBlue: "#1e3a5f", 
+                        brandOlive: "#5c7c3b", 
+                        portalCream: "#fefdfb",
+                        brandOrange: "#d97706",
+                        brandGold: "#c9a227",
+                        footerDark: "#0f172a",
+                        accent: "#3b82f6",
+                        surface: "#f8fafc",
+                        headerBg: "#1e3a5f"
+                    },
+                    fontFamily: {
+                        'display': ['Playfair Display', 'serif'],
+                        'body': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+
+        // Surgical Fix: Admin content points to 'ui" repo
+        const GITHUB_CONFIG = { owner: "magawass", repo: "ui", path: "data/content.json" };
+        let adminContent = {
+            headerTitle: "WELCOME TO THE OFFICIAL STUDENT PORTAL",
+            headerSub: "EST. 1990 | EXCELLENCE & INTEGRITY",
+            headerImg: "https://raw.githubusercontent.com/ChikumbutsoLubaini/Teacher-Assistant/main/school_building.jpg",
+            announcements: "",
+            aboutText: "",
+            upcoming: "",
+            adverts: [], 
+            noticeBoard: [], 
+            mediaGallery: [] 
+        };
+
+        // --- Navigation Logic ---
+        function showPage(pageId) {
+            document.getElementById('mainNav').style.display = 'flex';
+            document.getElementById('mainFooter').style.display = 'flex';
+            document.getElementById('portalContainer').classList.remove('active');
+            document.getElementById('welcomeOverlay').classList.remove('active');
+            
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(pageId);
+            if (target) target.classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function openPortal(url) {
+            document.getElementById('mainNav').style.display = 'none';
+            document.getElementById('mainFooter').style.display = 'none';
+            document.getElementById('welcomeOverlay').classList.remove('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('portalContainer').classList.add('active');
+            document.querySelector('#portalContainer iframe').src = url;
+        }
+
+        // --- Data Logic (Sync with magawass/ui) ---
+        async function loadContent() {
+            try {
+                const rawUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${GITHUB_CONFIG.path}`;
+                const response = await fetch(rawUrl, { cache: 'no-store' });
+                if (response.ok) {
+                    adminContent = await response.json();
+                    updateDisplayContent();
+                    renderAdminLists();
+                    return;
+                }
+            } catch (error) {
+                console.log("Loading local fallback");
+                const local = localStorage.getItem('magawaAdminContent');
+                if(local) adminContent = JSON.parse(local);
+                updateDisplayContent();
+            }
+        }
+
+        function updateDisplayContent() {
+            document.getElementById('displayHeaderTitle').innerText = adminContent.headerTitle;
+            document.getElementById('displayHeaderSub').innerText = adminContent.headerSub;
+            document.getElementById('heroBanner').style.backgroundImage = `url('${adminContent.headerImg || "https://raw.githubusercontent.com/ChikumbutsoLubaini/Teacher-Assistant/main/school_building.jpg"}')`;
+            
+            document.getElementById('displayAnnouncement').innerText = adminContent.announcements || "No recent announcements.";
+            document.getElementById('displayAboutText').innerText = adminContent.aboutText || "Namitete Secondary School is dedicated to excellence.";
+            document.getElementById('displayUpcoming').innerText = adminContent.upcoming || "No upcoming events scheduled.";
+
+            const renderItems = (items) => (items || []).map(item => `
+                <div class="mb-4 bg-surface rounded-xl p-4 border border-gray-100 hover:shadow-md transition-shadow duration-300">
+                    ${(item.image || item.file) ? `<img src="${item.image || item.file}" class="w-full rounded-lg mb-3 object-cover">` : ''}
+                    <p class="text-sm font-medium text-gray-700">${item.text || item.caption || ''}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('displayAdverts').innerHTML = renderItems(adminContent.adverts);
+            document.getElementById('displayNoticeBoard').innerHTML = renderItems(adminContent.noticeBoard);
+            document.getElementById('galleryDisplay').innerHTML = renderItems(adminContent.mediaGallery);
+        }
+
+        // --- Admin Functions ---
+        async function saveToGithub() {
+            const btn = document.getElementById('saveBtn');
+            const token = document.getElementById('ghTokenInput').value;
+            if(!token) return alert("Enter GitHub Token");
+
+            btn.disabled = true;
+            btn.innerHTML = "SAVING...";
+
+            try {
+                adminContent.headerTitle = document.getElementById('adminHeaderTitle').value;
+                adminContent.headerSub = document.getElementById('adminHeaderSub').value;
+                adminContent.announcements = document.getElementById('adminAnnounceInput').value;
+                adminContent.aboutText = document.getElementById('adminAboutInput').value;
+                adminContent.upcoming = document.getElementById('adminUpcomingInput').value;
+
+                const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+                let sha = "";
+                const checkRes = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
+                if (checkRes.ok) { const d = await checkRes.json(); sha = d.sha; }
+
+                const finalJson = JSON.stringify(adminContent);
+                const base64Content = btoa(unescape(encodeURIComponent(finalJson)));
+
+                const syncRes = await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: "Update Portal Content", content: base64Content, sha: sha })
+                });
+
+                if (syncRes.ok) {
+                    alert("Changes Published Successfully!");
+                    localStorage.setItem('magawaAdminContent', finalJson);
+                    updateDisplayContent();
+                }
+            } catch (err) {
+                alert("Error saving: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = "PUBLISH ALL CHANGES";
+            }
+        }
+
+        async function addItem(type) {
+            const textInput = document.getElementById(`admin${type}Text`);
+            const fileInput = document.getElementById(`admin${type}File`);
+            let imgData = "";
+            
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                imgData = await new Promise(r => {
+                    reader.onload = e => r(e.target.result);
+                    reader.readAsDataURL(fileInput.files[0]);
+                });
+            }
+            
+            const newItem = { text: textInput.value, image: imgData };
+            if(!adminContent[type]) adminContent[type] = [];
+            adminContent[type].push(newItem);
+            renderAdminLists();
+            textInput.value = "";
+        }
+
+        function deleteItem(type, index) {
+            adminContent[type].splice(index, 1);
+            renderAdminLists();
+        }
+
+        function renderAdminLists() {
+            ['adverts', 'noticeBoard', 'mediaGallery'].forEach(type => {
+                const el = document.getElementById(`admin${type}List`);
+                if(el) el.innerHTML = (adminContent[type] || []).map((item, idx) => `
+                    <div class="flex justify-between text-xs p-3 bg-red-50 rounded-lg mb-2 border border-red-100">
+                        <span class="text-gray-700">${item.text || 'Item'}</span>
+                        <button onclick="deleteItem('${type}', ${idx})" class="text-red-500 hover:text-red-700 font-semibold px-2">REMOVE</button>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function authenticateAdmin() {
+            if (document.getElementById('adminPass').value === '0') {
+                showPage('adminPanel');
+                document.getElementById('adminHeaderTitle').value = adminContent.headerTitle;
+                document.getElementById('adminHeaderSub').value = adminContent.headerSub;
+                document.getElementById('adminAboutInput').value = adminContent.aboutText;
+                document.getElementById('adminAnnounceInput').value = adminContent.announcements;
+                document.getElementById('adminUpcomingInput').value = adminContent.upcoming;
+                renderAdminLists();
+            } else {
+                alert('Access Denied: Incorrect Password');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadContent);
+    </script>
+
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .hero-banner {
+            height: 520px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .hero-banner::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.85) 0%, rgba(15, 23, 42, 0.75) 100%);
+        }
+
+        .hero-banner::after {
+            content: "";
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 150px;
+            background: linear-gradient(to top, rgba(248, 250, 252, 1), transparent);
+        }
+        
+        .portal-wrapper {
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+            padding-bottom: 80px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-card {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            width: 92%;
+            max-width: 1200px;
+            margin-top: -100px;
+            padding: 50px;
+            border-radius: 24px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.5);
+            z-index: 10;
+            position: relative;
+        }
+
+        .main-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #1e3a5f, #5c7c3b, #d97706);
+            border-radius: 24px 24px 0 0;
+        }
+
+        .action-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, #1e3a5f, #3b82f6);
+            border-radius: 2px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
+        }
+
+        iframe { width: 100%; height: calc(100vh - 60px); border: none; }
+        
+        #portalContainer.active { 
+            display: block; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100vh; 
+            background: white; 
+            z-index: 1000; 
+        }
+        
+        .admin-input { 
+            border: 2px solid #e2e8f0; 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            width: 100%; 
+            margin-bottom: 12px; 
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        .admin-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .nav-link {
+            position: relative;
+            padding: 8px 0;
+        }
+
+        .nav-link::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #ffffff;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .decorative-pattern {
+            background-image: radial-gradient(circle at 1px 1px, rgba(30, 58, 95, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        /* Welcome Modal Styles */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            z-index: 999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .welcome-overlay.active {
+            display: flex;
+        }
+
+        .welcome-content {
+            text-align: center;
+            color: white;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        .welcome-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-content p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body class="bg-surface decorative-pattern">
+
+    <!-- Header Navigation - Now with brandBlue background -->
+    <header id="mainNav" class="bg-headerBg px-[5%] py-4 flex justify-between items-center sticky top-0 z-50 shadow-lg">
+        <div class="flex flex-col">
+            <h1 class="text-2xl font-display font-bold tracking-tight leading-none text-white">NAMITETE</h1>
+            <p class="text-[10px] font-semibold text-white/70 tracking-[0.2em] uppercase">Secondary School</p>
+        </div>
+        <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold uppercase tracking-wide">
+            <button onclick="showPage('homePage')" class="nav-link text-white/90 hover:text-white transition-colors">Home</button>
+            <button onclick="showWelcome()" class="nav-link text-white/90 hover:text-white transition-colors">Student Portal</button>
+            <button onclick="showPage('adminLogin')" class="bg-white text-brandBlue px-6 py-2.5 rounded-full hover:bg-gray-100 transition-all hover:shadow-lg">Admin Login</button>
+        </nav>
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden text-white p-2">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </header>
+
+    <main>
+        <!-- Home Page -->
+        <div id="homePage" class="page active">
+            <!-- Hero Section -->
+            <div class="hero-banner" id="heroBanner">
+                <div class="relative z-10 text-white text-center mt-24 px-6 max-w-4xl">
+                    <div class="inline-block mb-6 px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+                        <span class="text-xs font-medium tracking-widest uppercase text-white/90">Established 1990</span>
+                    </div>
+                    <h2 id="displayHeaderTitle" class="font-display text-4xl md:text-6xl font-bold drop-shadow-lg leading-tight">
+                        WELCOME TO THE OFFICIAL STUDENT PORTAL
+                    </h2>
+                    <p id="displayHeaderSub" class="mt-4 text-base md:text-lg font-medium text-white/80 tracking-wide">
+                        EST. 1990 | EXCELLENCE & INTEGRITY
+                    </p>
+                    <div class="mt-8 flex justify-center gap-4">
+                        <button onclick="showWelcome()" class="bg-white text-brandBlue px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all hover:shadow-xl">
+                            <i class="fas fa-arrow-right mr-2"></i> Get Started/Yambani
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overlapping Main Card -->
+            <div class="portal-wrapper">
+                <div class="main-card">
+                    <!-- Information Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Column 1: About & Announcements -->
+                        <div class="space-y-8">
+                            <div class="info-card">
+                                <h3 class="section-title text-sm font-bold uppercase tracking-widest text-brandBlue mb-6">About Our School</h3>
+                                <p id="displayAboutText" class="text-gray-600 leading-relaxed text-sm"></p>
+                            </div>
+                            
+                            <div class="info-card bg-gradient-to-br from-blue-50 to-white border-blue-100">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 bg-brandBlue/10 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-bullhorn text-brandBlue"></i>
+                                    </div>
+                                    <h3 class="text-sm font-bold uppercase tracking-widest text-brandBlue">Latest Announcements</h3>
+                                </div>
+                                <p id="displayAnnouncement" class="text-gray-600 text-sm italic"></p>
+                            </div>
+                        </div>
+
+                        <!-- Column 2: Notice Board & Events -->
+                        <div class="space-y-8">
+                            <div class="info-card">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="w-10 h-10 bg-brandOlive/10 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-thumbtack text-brandOlive"></i>
+                                    </div>
+                                    <h3 class="section-title text-sm font-bold uppercase tracking-widest text-brandOlive">Notice Board</h3>
+                                </div>
+                                <div id="displayNoticeBoard" class="space-y-4"></div>
+                            </div>
+                            
+                            <div class="info-card bg-gradient-to-br from-amber-50 to-white border-amber-100">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 bg-brandOrange/10 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-calendar-alt text-brandOrange"></i>
+                                    </div>
+                                    <h3 class="text-sm font-bold uppercase tracking-widest text-brandOrange">Upcoming Events</h3>
+                                </div>
+                                <p id="displayUpcoming" class="text-gray-700 text-sm font-medium"></p>
+                            </div>
+                        </div>
+
+                        <!-- Column 3: Gallery & Adverts -->
+                        <div class="space-y-8">
+                            <div class="info-card">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-images text-accent"></i>
+                                    </div>
+                                    <h3 class="section-title text-sm font-bold uppercase tracking-widest text-accent">Media Gallery</h3>
+                                </div>
+                                <div id="galleryDisplay" class="grid grid-cols-1 gap-4"></div>
+                            </div>
+                            
+                            <div class="info-card bg-gradient-to-br from-purple-50 to-white border-purple-100">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-ad text-purple-600"></i>
+                                    </div>
+                                    <h3 class="text-sm font-bold uppercase tracking-widest text-purple-600">Adverts</h3>
+                                </div>
+                                <div id="displayAdverts"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Login (Password: 0) - Centered Modal Style -->
+        <div id="adminLogin" class="page">
+            <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 px-6 py-12">
+                <div class="max-w-md w-full">
+                    <div class="bg-white p-10 rounded-3xl shadow-2xl border border-gray-100 text-center relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brandBlue via-brandOlive to-brandOrange"></div>
+                        <div class="w-20 h-20 bg-brandBlue/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-user-shield text-3xl text-brandBlue"></i>
+                        </div>
+                        <h2 class="text-2xl font-display font-bold mb-2 text-brandBlue">Admin Access</h2>
+                        <p class="text-gray-500 text-sm mb-8">Enter your credentials to continue</p>
+                        <input type="password" id="adminPass" placeholder="Enter Password" class="admin-input text-center text-lg tracking-widest">
+                        <button onclick="authenticateAdmin()" class="w-full bg-brandBlue text-white py-4 rounded-xl font-bold hover:bg-brandBlue/90 transition-all mt-4 shadow-lg shadow-brandBlue/20 hover:shadow-xl hover:shadow-brandBlue/30">
+                            <i class="fas fa-lock-open mr-2"></i> LOG IN
+                        </button>
+                        <button onclick="showPage('homePage')" class="mt-4 text-gray-400 text-sm hover:text-gray-600 transition-colors">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to Home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Panel (Syncs with magawass/ui) -->
+        <div id="adminPanel" class="page py-10 px-6 min-h-screen bg-surface">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-10">
+                    <div>
+                        <h2 class="text-3xl font-display font-bold text-brandBlue">Content Editor</h2>
+                        <p class="text-gray-500 text-sm mt-1">Synced with UI Repository</p>
+                    </div>
+                    <button onclick="showPage('homePage')" class="flex items-center gap-2 text-gray-500 font-semibold hover:text-brandBlue transition-colors">
+                        <i class="fas fa-arrow-left"></i> Back to Site
+                    </button>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 mb-8 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-emerald-500"></div>
+                    <div class="flex flex-col md:flex-row gap-4 items-end">
+                        <div class="flex-1">
+                            <label class="text-xs font-bold text-red-600 block mb-2 uppercase tracking-wider">
+                                <i class="fas fa-key mr-1"></i> GitHub Secret Token
+                            </label>
+                            <input type="password" id="ghTokenInput" placeholder="Paste your token here" class="admin-input mb-0">
+                        </div>
+                        <button id="saveBtn" onclick="saveToGithub()" class="w-full md:w-auto bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-green-500/25 transition-all">
+                            <i class="fas fa-cloud-upload-alt mr-2"></i> PUBLISH ALL CHANGES
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                        <h3 class="font-bold mb-6 pb-3 border-b border-gray-100 text-sm uppercase tracking-widest text-gray-700 flex items-center gap-2">
+                            <i class="fas fa-edit text-brandBlue"></i> General Content
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-bold block mb-2 uppercase tracking-wider text-gray-600">Hero Title</label>
+                                <input type="text" id="adminHeaderTitle" class="admin-input">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold block mb-2 uppercase tracking-wider text-gray-600">Hero Subtitle</label>
+                                <input type="text" id="adminHeaderSub" class="admin-input">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold block mb-2 uppercase tracking-wider text-gray-600">About Us Text</label>
+                                <textarea id="adminAboutInput" class="admin-input h-32 resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold block mb-2 uppercase tracking-wider text-gray-600">Announcements</label>
+                                <textarea id="adminAnnounceInput" class="admin-input h-24 resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold block mb-2 uppercase tracking-wider text-gray-600">Upcoming Events</label>
+                                <textarea id="adminUpcomingInput" class="admin-input h-24 resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                            <h3 class="font-bold mb-6 pb-3 border-b border-gray-100 text-sm uppercase tracking-widest text-gray-700 flex items-center gap-2">
+                                <i class="fas fa-thumbtack text-brandOlive"></i> Notice Board / Gallery
+                            </h3>
+                            <div class="space-y-6">
+                                <div class="bg-surface p-4 rounded-xl">
+                                    <label class="text-xs font-bold block mb-2 uppercase tracking-wider text-gray-600">Add Notice</label>
+                                    <input type="text" id="adminnoticeBoardText" placeholder="Notice Headline" class="admin-input">
+                                    <input type="file" id="adminnoticeBoardFile" class="text-xs mb-3 block text-gray-500">
+                                    <button onclick="addItem('noticeBoard')" class="bg-brandBlue text-white px-5 py-2 text-sm rounded-lg font-semibold hover:bg-brandBlue/90 transition-colors">
+                                        <i class="fas fa-plus mr-1"></i> Add Notice
+                                    </button>
+                                    <div id="adminnoticeBoardList" class="mt-4 max-h-40 overflow-y-auto"></div>
+                                </div>
+                                
+                                <div class="bg-surface p-4 rounded-xl">
+                                    <label class="text-xs font-bold block mb-2 uppercase tracking-wider text-gray-600">Add to Gallery</label>
+                                    <input type="text" id="adminmediaGalleryText" placeholder="Gallery Caption" class="admin-input">
+                                    <input type="file" id="adminmediaGalleryFile" class="text-xs mb-3 block text-gray-500">
+                                    <button onclick="addItem('mediaGallery')" class="bg-brandOlive text-white px-5 py-2 text-sm rounded-lg font-semibold hover:bg-brandOlive/90 transition-colors">
+                                        <i class="fas fa-plus mr-1"></i> Add to Gallery
+                                    </button>
+                                    <div id="adminmediaGalleryList" class="mt-4 max-h-40 overflow-y-auto"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Welcome Overlay (Blue Background with Exam Buttons) -->
+    <div id="welcomeOverlay" class="welcome-overlay">
+        <div class="welcome-content">
+            <div class="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                <i class="fas fa-graduation-cap text-5xl text-white"></i>
+            </div>
+            <h2>Welcome to Namitete</h2>
+            <p>Your journey to academic excellence begins here. Select an exam portal to continue.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                <button onclick="openPortal('https://magawass.github.io/m/brief22_BUTTONS_FIXED.html')" class="action-btn bg-brandBlue text-white px-8 py-4 rounded-xl font-semibold hover:bg-brandBlue/90 transition-all shadow-lg shadow-brandBlue/20 flex items-center justify-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    EXAMS DAY
+                </button>
+                <button onclick="openPortal('https://magawass.github.io/m/ODL.html')" class="action-btn bg-brandOlive text-white px-8 py-4 rounded-xl font-semibold hover:bg-brandOlive/90 transition-all shadow-lg shadow-brandOlive/20 flex items-center justify-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    EXAMS ODL
+                </button>
+            </div>
+            <button onclick="closeWelcome()" class="mt-6 text-white/60 hover:text-white transition-colors text-sm">
+                <i class="fas fa-arrow-left mr-1"></i> Back to Home
+            </button>
+        </div>
+    </div>
+
+    <!-- Portal Container (Iframe Overlay) -->
+    <div id="portalContainer" class="hidden">
+        <div class="bg-brandBlue p-4 flex justify-between items-center text-white shadow-lg">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-school"></i>
+                </div>
+                <span class="font-bold text-sm uppercase tracking-widest">NAMITETE OFFICIAL PORTAL</span>
+            </div>
+            <button onclick="showPage('homePage')" class="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+                <i class="fas fa-times"></i> EXIT PORTAL
+            </button>
+        </div>
+        <iframe src=""></iframe>
+    </div>
+
+    <!-- Footer -->
+    <footer id="mainFooter" class="bg-footerDark text-gray-400 py-16 px-[5%]">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-10">
+                <div>
+                    <h3 class="text-2xl font-display font-bold text-white mb-3">Namitete Secondary School</h3>
+                    <p class="text-gray-500 text-sm">Excellence in Education Since 1990</p>
+                    <div class="flex gap-4 mt-6">
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors">
+                            <i class="fab fa-facebook-f text-white"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors">
+                            <i class="fab fa-twitter text-white"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors">
+                            <i class="fab fa-instagram text-white"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-semibold uppercase tracking-widest text-sm mb-4">Contact Office</p>
+                    <div class="space-y-2 text-sm">
+                        <p class="flex items-center justify-end gap-2">
+                            <span>📞 +265 99 40 39 325</span>
+                        </p>
+                        <p class="flex items-center justify-end gap-2">
+                            <span>✉️ info@namitete.edu.mw</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-500 text-sm">© 2026 All Rights Reserved.</p>
+                <p class="text-sm">Designed by <span class="text-brandOrange font-semibold">CHIKUMBUTSO LUBAINI-0994039325</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Welcome Modal Functions
+        function showWelcome() {
+            document.getElementById('welcomeOverlay').classList.add('active');
+        }
+
+        function closeWelcome() {
+            document.getElementById('welcomeOverlay').classList.remove('active');
+        }
+    </script>
+
+</body>
+</html>
