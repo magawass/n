@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -216,7 +216,7 @@ function saveSelectedSubjectsToRepo() {
     .page {
         display: none;
         width: 95%;
-        max-width: 650px;
+        max-width: 480px;
         padding: 30px;
         background: #FFFFFF;
         border-radius: 12px;
@@ -244,7 +244,7 @@ function saveSelectedSubjectsToRepo() {
         text-align: center;
     }
 
-    select, input:not([type="file"]):not([type="password"]), textarea {
+    select, input:not([type="file"]), textarea {
         width: 100%;
         max-width: 400px;
         padding: 12px;
@@ -454,29 +454,57 @@ function saveSelectedSubjectsToRepo() {
 
     .hidden { display: none !important; }
 
+    /* === SURGICAL FIX: Widen login & analysis selector to match sheet pages width === */
+    #adminLoginPage,
+    #analysisSelectorPage {
+        width: auto !important;
+        max-width: none !important;
+        min-width: 100%;
+    }
+
+    /* === SHEET PAGES: Expand to enclose all columns === */
+    #scoreSheetView,
+    #gradesPage,
+    #analysisPage {
+        width: auto !important;
+        max-width: none !important;
+        min-width: 100%;
+        overflow-x: auto;
+    }
+
+    #scoreSheetView .table-wrapper,
+    #gradesPage .table-wrapper,
+    #analysisPage .table-wrapper {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    #gradesTable,
+    #analysisTable,
+    #scoresTable {
+        width: max-content;
+        min-width: 100%;
+        table-layout: auto;
+    }
+
     /* Mobile Adjustments */
     @media (max-width: 480px) {
         body { padding: 10px; }
         .page { padding: 15px; width: 98%; }
         #progressReport, #briefReport { padding: 20px 10px; width: 98%; }
 
-        /* Sheet pages: allow full width with scrollable tables on mobile */
+        /* Sheet pages: full width on mobile */
         #scoreSheetView,
         #gradesPage,
         #analysisPage {
             width: 100% !important;
-            max-width: 100% !important;
             padding: 10px !important;
         }
         #scoreSheetView .table-wrapper,
         #gradesPage .table-wrapper,
         #analysisPage .table-wrapper {
             overflow-x: auto !important;
-            margin-left: -10px;
-            margin-right: -10px;
-            padding-left: 10px;
-            padding-right: 10px;
-            width: calc(100% + 20px) !important;
+            width: 100% !important;
         }
         #gradesTable, #analysisTable, #scoresTable {
             width: max-content !important;
@@ -512,13 +540,12 @@ function saveSelectedSubjectsToRepo() {
         }
     }
 
-    /* Tablet breakpoint - sheets need wider container */
+    /* Tablet breakpoint */
     @media (min-width: 481px) and (max-width: 767px) {
         #scoreSheetView,
         #gradesPage,
         #analysisPage {
             width: 98% !important;
-            max-width: 98vw !important;
             overflow-x: auto !important;
         }
         #scoreSheetView .table-wrapper,
@@ -538,7 +565,6 @@ function saveSelectedSubjectsToRepo() {
         #scoreSheetView,
         #gradesPage,
         #analysisPage {
-            max-width: 98vw !important;
             width: 98vw !important;
             overflow-x: auto !important;
         }
@@ -750,8 +776,8 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="initialPage" class="page">
-    <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" alt="Namitete Secondary School Logo" class="logo">
-    <h1><p style="font-size:28px;">NAMITETE SECONDARY-ODL</p></h1>
+    <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" alt="Namitete Secondary School Logo" class="logo">
+    <h1><p style="font-size:28px;">NAMITETE SECONDARY SCHOOL</p></h1>
     <h2>EXAM PORTAL</h2>
     <label for="selectedForm">Select Form / Sankhani Kalasi</label>
     <select id="selectedForm">
@@ -762,7 +788,7 @@ function saveSelectedSubjectsToRepo() {
       <option value="form4">Form 4</option>
     </select>
     <label for="studentNumberInput">Enter Exam Number / Lowetsani nambala ya mayeso</label>
-    <input type="text" id="studentNumberInput" placeholder="e.g. J047 or M047">
+    <input type="text" id="studentNumberInput" placeholder=" ">
     <label for="passwordInput">Enter Password / Lembani nambala ya chinsinsi</label>
     <input type="password" id="passwordInput" placeholder="Here / Pano">
 
@@ -779,7 +805,7 @@ function saveSelectedSubjectsToRepo() {
     <button class="back-btn" onclick="handleBriefBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
     <header id="briefReportHeader" style="width: 100%;">
-        <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
+        <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" class="logo" alt="School Logo">
         <div id="briefReportHeaderRight">
             <h3>NAMITETE SECONDARY SCHOOL</h3>
             Private Bag 3, Namitete<br>
@@ -829,7 +855,7 @@ function saveSelectedSubjectsToRepo() {
     <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
     <header id="reportHeader" style="width: 100%;">
-        <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
+        <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" class="logo" alt="School Logo">
         <div id="reportHeaderRight">
             <div style="font-family: 'Times New Roman', Times, serif;">
     <p style="margin:5px 0;"><h3>NAMITETE SECONDARY SCHOOL</h3>
@@ -961,6 +987,7 @@ function saveSelectedSubjectsToRepo() {
                     <tr style="background:#ecf0f1;">
                         <th style="border:1px solid #cc6600;padding:10px;">Exam Number</th>
                         <th style="border:1px solid #cc6600;padding:10px;">Name</th>
+                        <th style="border:1px solid #cc6600;padding:10px;">Sex</th>
                         <th style="border:1px solid #cc6600;padding:10px;">Score</th>
                     </tr>
                 </thead>
@@ -1062,7 +1089,8 @@ function saveSelectedSubjectsToRepo() {
         <option value="form4">Form 4</option>
     </select>
     <input type="text" id="manualStudentName" placeholder="Full Student Name">
-    <input type="text" id="manualExamNumber" placeholder="Exam Number (e.g. J047)">
+    <input type="text" id="manualSex" placeholder="Sex (M for Boy, F for Girl)">
+    <input type="text" id="manualExamNumber" placeholder="Exam Number (  )">
     <input type="text" id="manualDOB" placeholder="Date of Birth (e.g. 2005-12-01)">
     <button onclick="addStudentManually()" style="background: #17a2b8;">Add Student to List</button>
 
@@ -1142,7 +1170,7 @@ function saveSelectedSubjectsToRepo() {
             <option value="form4">Form 4</option>
         </select>
         <label for="progressExamNumber">Enter Exam Number</label>
-        <input type="text" id="progressExamNumber" placeholder="e.g. J047 or M047">
+        <input type="text" id="progressExamNumber" placeholder="e.g. ">
         <button onclick="openStudentProgressSheet()" style="margin-top: 10px;">View Student Progress</button>
         <button onclick="generateAllProgressReports()" style="margin-top: 10px; background: #28a745;">Progress Report Generator (Batch PDF)</button>
     </div>
@@ -1202,7 +1230,7 @@ function saveSelectedSubjectsToRepo() {
 <script>
 // --- GITHUB CONSTANTS ---
 const GITHUB_USER = 'magawass';
-const GITHUB_REPO = 'n2';
+const GITHUB_REPO = 'n';
 const CONFIG_FILE = 'config.json';
 const ADMIN_PASSWORD = '00n'; // Placeholder for security testing/local use
 
@@ -1229,7 +1257,7 @@ const SUBJECT_MAP = {
     "Social/Life": "S/Life"
 };
 const ALL_SUBJECTS = Object.keys(SUBJECT_MAP); // Full names used for internal logic
-const BASE_HEADERS = ["STUDENT'S NAME", "Exam Number", "Date of Birth"];
+const BASE_HEADERS = ["STUDENT'S NAME", "Sex", "Exam Number", "Date of Birth"];
 const ALL_HEADERS = [...BASE_HEADERS, ...ALL_SUBJECTS];
 const ALL_CLASSES = ['form1', 'form2', 'form3', 'form4'];
 const DEFAULT_TEACHER = '-';
@@ -1590,6 +1618,18 @@ function isStudentPass(form, student) {
     return passCount >= 6 && upperPass(engGrade);
 }
 
+function getStudentSex(student) {
+    if (student['Sex']) {
+        const sex = student['Sex'].toString().trim().toUpperCase();
+        if (sex === 'M' || sex === 'F') return sex;
+    }
+    // Fallback: derive from exam number prefix
+    const examNo = (student['Exam Number'] || '').toString().trim().toUpperCase();
+    if (examNo.startsWith('M')) return 'M';
+    if (examNo.startsWith('J') || examNo.startsWith('F')) return 'F';
+    return '-';
+}
+
 function generateTeacherComment(form, student, average, passCount, totalSubjects) {
     const pass = isStudentPass(form, student);
     const isLower = form === 'form1' || form === 'form2';
@@ -1705,35 +1745,43 @@ function printSheet(pageId) {
     styleOverride.id = 'landscapePrintStyle';
     styleOverride.innerHTML = `
         @page { size: A4 landscape !important; margin: 0.5cm !important; }
-        body * { visibility: hidden !important; }
-        body { visibility: visible !important; }
-        #${pageId} {
-            visibility: visible !important;
-            display: block !important;
-            padding: 15px !important;
-            margin: 0 auto !important;
-            position: absolute !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            top: 0;
-            width: 100% !important;
-            max-width: none !important;
-            box-shadow: none !important;
-        }
-        #${pageId} *,
-        #${pageId} .table-wrapper,
-        #${pageId} table,
-        #${pageId} thead,
-        #${pageId} tbody,
-        #${pageId} tr,
-        #${pageId} td,
-        #${pageId} th {
-            visibility: visible !important;
-        }
-        #${pageId} button, #${pageId} select, #${pageId} label, #${pageId} input {
-            display: none !important;
-        }
-        @media (min-width: 768px) {
+        @media print {
+            html, body {
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+            body * { visibility: hidden !important; }
+            body { visibility: visible !important; }
+            #${pageId} {
+                visibility: visible !important;
+                display: block !important;
+                padding: 15px !important;
+                margin: 0 !important;
+                position: absolute !important;
+                left: 0 !important;
+                right: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                transform: none !important;
+            }
+            #${pageId} *,
+            #${pageId} .table-wrapper,
+            #${pageId} table,
+            #${pageId} thead,
+            #${pageId} tbody,
+            #${pageId} tr,
+            #${pageId} td,
+            #${pageId} th {
+                visibility: visible !important;
+            }
+            #${pageId} button, #${pageId} select, #${pageId} label, #${pageId} input {
+                display: none !important;
+            }
             #gradesTable, #analysisTable, #scoresTable {
                 width: 100% !important;
                 min-width: 100% !important;
@@ -2386,6 +2434,7 @@ async function loadResults(isStudentPortal) {
         updateLoadingPercent(75);
 
         document.getElementById('reportStudentName').textContent = student["STUDENT'S NAME"] || '-';
+        document.getElementById('reportSex').textContent = getStudentSex(student);
         document.getElementById('reportForm').textContent = form.toUpperCase();
         document.getElementById('reportExamNo').textContent = studentNumber;
         document.getElementById('reportTerm').textContent = currentConfig.term;
@@ -2799,7 +2848,7 @@ async function displayScoreSheet() {
 
     const isLowerForm = form === 'form1' || form === 'form2';
 
-    let html = '<table id="scoresTable"><thead><tr><th>POS</th><th>Exam No</th><th>Name</th>';
+    let html = '<table id="scoresTable"><thead><tr><th>POS</th><th>Exam No</th><th>Name</th><th>Sex</th>';
     ALL_SUBJECTS.forEach(sub => { html += `<th>${getSubjectShortName(sub)}</th>`; });
     if (isLowerForm) {
         html += '<th>Total</th>';
@@ -2825,7 +2874,7 @@ async function displayScoreSheet() {
         lastPos = pos;
 
         let totalScore = 0;
-        let rowHtml = `<tr><td>${pos}</td><td>${student["Exam Number"]}</td><td>${student["STUDENT'S NAME"]}</td>`;
+        let rowHtml = `<tr><td>${pos}</td><td>${student["Exam Number"]}</td><td>${student["STUDENT'S NAME"]}</td><td>${getStudentSex(student)}</td>`;
 
         ALL_SUBJECTS.forEach(sub => {
             const rawScore = student[sub] || '-';
@@ -2860,7 +2909,7 @@ async function displayGradesSheet() {
     const isUpperForm = form === 'form3' || form === 'form4';
     const finalColHeader = isUpperForm ? 'Aggregate' : 'Total Score';
 
-    let html = `<table id="gradesTable"><thead><tr><th>POSITION</th><th>Exam No</th><th>Name</th>`;
+    let html = `<table id="gradesTable"><thead><tr><th>POSITION</th><th>Exam No</th><th>Name</th><th>Sex</th>`;
     ALL_SUBJECTS.forEach(sub => { html += `<th>${getSubjectShortName(sub)}</th>`; });
     html += `<th>${finalColHeader}</th><th>Remark</th></tr></thead><tbody>`;
 
@@ -2896,7 +2945,7 @@ async function displayGradesSheet() {
     studentsWithMetrics.forEach(({ student, metrics }) => {
         const position = student.__position;
 
-        let rowHtml = `<tr><td>${position}</td><td>${student["Exam Number"]}</td><td>${student["STUDENT'S NAME"]}</td>`;
+        let rowHtml = `<tr><td>${position}</td><td>${student["Exam Number"]}</td><td>${student["STUDENT'S NAME"]}</td><td>${getStudentSex(student)}</td>`;
 
         ALL_SUBJECTS.forEach(sub => {
             const rawScore = student[sub];
@@ -2954,11 +3003,14 @@ async function displayAnalysisSheet(form) {
     ALL_SUBJECTS.forEach(sub => {
         subjectMetrics[sub] = {
             pass: 0, fail: 0, entries: 0,
-            gradeCounts: Object.fromEntries(gradeLabels.map(l => [l, 0]))
+            gradeCounts: Object.fromEntries(gradeLabels.map(l => [l, 0])),
+            mPass: 0, mFail: 0, mEntries: 0,
+            fPass: 0, fFail: 0, fEntries: 0
         };
     });
 
     data.forEach(student => {
+        const studentSex = getStudentSex(student);
         ALL_SUBJECTS.forEach(sub => {
             const rawScore = student[sub];
             const numericScore = parseInt(rawScore);
@@ -2968,12 +3020,29 @@ async function displayAnalysisSheet(form) {
                 subjectMetrics[sub].entries++;
                 subjectMetrics[sub].gradeCounts[grade]++;
 
+                if (studentSex === 'M') subjectMetrics[sub].mEntries++;
+                else if (studentSex === 'F') subjectMetrics[sub].fEntries++;
+
                 if (isLowerForm) {
-                    if (['A', 'B', 'C', 'D'].includes(grade)) subjectMetrics[sub].pass++;
-                    else if (grade === 'F') subjectMetrics[sub].fail++;
+                    if (['A', 'B', 'C', 'D'].includes(grade)) {
+                        subjectMetrics[sub].pass++;
+                        if (studentSex === 'M') subjectMetrics[sub].mPass++;
+                        else if (studentSex === 'F') subjectMetrics[sub].fPass++;
+                    } else if (grade === 'F') {
+                        subjectMetrics[sub].fail++;
+                        if (studentSex === 'M') subjectMetrics[sub].mFail++;
+                        else if (studentSex === 'F') subjectMetrics[sub].fFail++;
+                    }
                 } else {
-                    if (['1', '2', '3', '4', '5', '6', '7', '8'].includes(grade)) subjectMetrics[sub].pass++;
-                    else if (grade === '9') subjectMetrics[sub].fail++;
+                    if (['1', '2', '3', '4', '5', '6', '7', '8'].includes(grade)) {
+                        subjectMetrics[sub].pass++;
+                        if (studentSex === 'M') subjectMetrics[sub].mPass++;
+                        else if (studentSex === 'F') subjectMetrics[sub].fPass++;
+                    } else if (grade === '9') {
+                        subjectMetrics[sub].fail++;
+                        if (studentSex === 'M') subjectMetrics[sub].mFail++;
+                        else if (studentSex === 'F') subjectMetrics[sub].fFail++;
+                    }
                 }
             }
         });
@@ -2981,9 +3050,11 @@ async function displayAnalysisSheet(form) {
 
     let html = '<table id="analysisTable"><thead><tr><th>Subject</th>';
     gradeLabels.forEach(label => { html += `<th>${label}</th>`; });
-    html += '<th>Pass %</th><th>Fail %</th><th>Entries</th></tr></thead><tbody>';
+    html += '<th>Pass %</th><th>Fail %</th><th>M Pass %</th><th>F Pass %</th><th>Entries</th></tr></thead><tbody>';
 
     const sortedSubjects = [...ALL_SUBJECTS].sort();
+    let totalMPass = 0, totalMEntries = 0, totalFPass = 0, totalFEntries = 0;
+    let totalMFail = 0, totalFFail = 0;
 
     sortedSubjects.forEach(sub => {
         const metrics = subjectMetrics[sub];
@@ -2992,17 +3063,116 @@ async function displayAnalysisSheet(form) {
             gradeLabels.forEach(label => { rowHtml += `<td>${metrics.gradeCounts[label] || 0}</td>`; });
             const passPercent = ((metrics.pass / metrics.entries) * 100).toFixed(1);
             const failPercent = (100 - parseFloat(passPercent)).toFixed(1);
-            rowHtml += `<td>${passPercent}%</td><td>${failPercent}%</td><td>${metrics.entries}</td></tr>`;
+            const mPassPercent = metrics.mEntries > 0 ? ((metrics.mPass / metrics.mEntries) * 100).toFixed(1) + '%' : '-';
+            const fPassPercent = metrics.fEntries > 0 ? ((metrics.fPass / metrics.fEntries) * 100).toFixed(1) + '%' : '-';
+            rowHtml += `<td>${passPercent}%</td><td>${failPercent}%</td><td>${mPassPercent}</td><td>${fPassPercent}</td><td>${metrics.entries}</td></tr>`;
             html += rowHtml;
+            totalMPass += metrics.mPass;
+            totalMEntries += metrics.mEntries;
+            totalFPass += metrics.fPass;
+            totalFEntries += metrics.fEntries;
+            totalMFail += metrics.mFail;
+            totalFFail += metrics.fFail;
         } else {
              let rowHtml = `<tr><td>${sub}</td>`;
              gradeLabels.forEach(() => { rowHtml += `<td>0</td>`; });
-             rowHtml += `<td>0.0%</td><td>0.0%</td><td>0</td></tr>`;
+             rowHtml += `<td>0.0%</td><td>0.0%</td><td>-</td><td>-</td><td>0</td></tr>`;
              html += rowHtml;
         }
     });
 
     html += '</tbody></table>';
+
+    // Calculate summary statistics
+    const totalEntries = totalMEntries + totalFEntries;
+    const totalPass = totalMPass + totalFPass;
+    const totalFail = totalMFail + totalFFail;
+
+    const boysPassPercent = totalMEntries > 0 ? ((totalMPass / totalMEntries) * 100).toFixed(1) : '0.0';
+    const boysFailPercent = totalMEntries > 0 ? ((totalMFail / totalMEntries) * 100).toFixed(1) : '0.0';
+    const girlsPassPercent = totalFEntries > 0 ? ((totalFPass / totalFEntries) * 100).toFixed(1) : '0.0';
+    const girlsFailPercent = totalFEntries > 0 ? ((totalFFail / totalFEntries) * 100).toFixed(1) : '0.0';
+    const totalPassPercent = totalEntries > 0 ? ((totalPass / totalEntries) * 100).toFixed(1) : '0.0';
+    const totalFailPercent = totalEntries > 0 ? ((totalFail / totalEntries) * 100).toFixed(1) : '0.0';
+
+    // Add summary table below the main table (less than half width)
+    html += `
+    <style>
+        #analysisSummaryTable {
+            width: 45%;
+            max-width: 350px;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            border: 1px solid black;
+            margin-top: 15px;
+        }
+        #analysisSummaryTable th, #analysisSummaryTable td {
+            border: 1px solid black;
+            padding: 8px 6px;
+            text-align: center;
+        }
+        #analysisSummaryTable th {
+            background: #ecf0f1;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        #analysisSummaryTable td:first-child {
+            font-weight: 600;
+            text-align: left;
+            padding-left: 10px;
+        }
+        #analysisSummaryTable tr:nth-child(2) td {
+            height: 10px;
+            background: #f9f9f9;
+        }
+    </style>
+    <table id="analysisSummaryTable">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Entered</th>
+                <th>Pass</th>
+                <th>Pass%</th>
+                <th>Fail</th>
+                <th>Fail%</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>BOYS</td>
+                <td>${totalMEntries}</td>
+                <td>${totalMPass}</td>
+                <td>${boysPassPercent}%</td>
+                <td>${totalMFail}</td>
+                <td>${boysFailPercent}%</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>GIRLS</td>
+                <td>${totalFEntries}</td>
+                <td>${totalFPass}</td>
+                <td>${girlsPassPercent}%</td>
+                <td>${totalFFail}</td>
+                <td>${girlsFailPercent}%</td>
+            </tr>
+            <tr>
+                <td>TOTAL</td>
+                <td>${totalEntries}</td>
+                <td>${totalPass}</td>
+                <td>${totalPassPercent}%</td>
+                <td>${totalFail}</td>
+                <td>${totalFailPercent}%</td>
+            </tr>
+        </tbody>
+    </table>`;
+
     wrapper.innerHTML = html;
 }
 
@@ -3061,9 +3231,11 @@ async function showStudentMarksList() {
         const val = s[subject] || '';
         
         const row = document.createElement('tr');
+        const sex = getStudentSex(s);
         row.innerHTML = `
             <td style="border:1px solid #cc6600;padding:8px;text-align:center;font-weight:normal;">${examNo}</td>
             <td style="border:1px solid #cc6600;padding:8px;font-weight:normal;">${name}</td>
+            <td style="border:1px solid #cc6600;padding:8px;text-align:center;font-weight:normal;">${sex}</td>
             <td style="border:1px solid #cc6600;padding:8px;text-align:center;">
                 <input type="text" 
                        id="score_${i}" 
@@ -3165,6 +3337,7 @@ async function generateAllProgressReports() {
         // 1. Populate the hidden report template
         const metrics = await calculateStudentMetrics(student, form);
         document.getElementById('reportStudentName').textContent = student["STUDENT'S NAME"] || '-';
+        document.getElementById('reportSex').textContent = getStudentSex(student);
         document.getElementById('reportForm').textContent = form.toUpperCase();
         document.getElementById('reportExamNo').textContent = studentNumber;
         document.getElementById('reportTerm').textContent = currentConfig.term;
@@ -3349,6 +3522,7 @@ async function addStudentManually() {
     const token = document.getElementById('githubToken').value;
     const form = document.getElementById('manualClassSelect').value;
     const name = document.getElementById('manualStudentName').value.trim();
+    const sex = document.getElementById('manualSex').value.trim().toUpperCase();
     const examNo = document.getElementById('manualExamNumber').value.trim().toUpperCase();
     const dob = document.getElementById('manualDOB').value.trim();
 
@@ -3374,6 +3548,7 @@ async function addStudentManually() {
         const newStudent = {};
         ALL_HEADERS.forEach(header => {
             if (header === "STUDENT'S NAME") newStudent[header] = name;
+            else if (header === "Sex") newStudent[header] = (sex === 'M' || sex === 'F') ? sex : '-';
             else if (header === "Exam Number") newStudent[header] = examNo;
             else if (header === "Date of Birth") newStudent[header] = dob;
             else newStudent[header] = '-'; // Set default score to dash
@@ -3400,6 +3575,7 @@ async function addStudentManually() {
             alert(`${name} added successfully to ${form.toUpperCase()}!`);
             // Clear inputs
             document.getElementById('manualStudentName').value = '';
+            document.getElementById('manualSex').value = '';
             document.getElementById('manualExamNumber').value = '';
             document.getElementById('manualDOB').value = '';
         }
