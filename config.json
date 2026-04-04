@@ -1,9 +1,9 @@
 {
   "term": "2",
-  "year": "",
+  "year": "2026",
   "generalComment": "Excellent effort. Keep up the hard work.",
-  "nextTermOpens": "",
-  "fees": "",
+  "nextTermOpens": "5th January,2026",
+  "fees": "K180,000.00",
   "gradeKeyLower": {
     "A": 80,
     "B": 60,
@@ -42,17 +42,17 @@
   },
   "teachers": {
     "form1": {
-      "Agriculture": "-",
-      "Bible Knowledge": "-",
-      "Biology": "-",
-      "Chemistry": "-",
-      "Chichewa": "-",
-      "English": "-",
-      "Geography": "-",
-      "History": "-",
-      "Mathematics": "-",
-      "Physics": "-",
-      "Social/Life": "-"
+      "Agriculture": "Mtonga",
+      "Bible Knowledge": "L Jere",
+      "Biology": "Chipoya",
+      "Chemistry": "Matope",
+      "Chichewa": "Chapita",
+      "English": "Thom",
+      "Geography": "Henderson",
+      "History": "Mthunzi",
+      "Mathematics": "Mkhweza",
+      "Physics": "Master",
+      "Social/Life": "Namfuko"
     },
     "form2": {
       "Agriculture": "-",
