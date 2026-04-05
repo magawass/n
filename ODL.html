@@ -275,7 +275,7 @@ function saveScoresAsExcel() {
         return;
     }
     
-    exportToExcel('dataEntryTable', `Namitete_Scores_${form}_${subject}`);
+    exportToExcel('dataEntryTable', `Scores_${form}_${subject}`);
 }
 
 function saveSelectedSubjectsToRepo() {
@@ -536,25 +536,26 @@ function saveSelectedSubjectsToRepo() {
     /* Progress Report Layout */
     #progressReport #reportHeader {
         display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        margin-bottom: 18px;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 5px;
         width: 100%;
     }
 
-    #progressReport #reportHeader .logo, #briefReport #briefReportHeader .logo { width: 130px; height: 100px; }
-    #reportHeaderRight, #briefReportHeaderRight { font-size: 9pt; }
-    #reportHeaderRight h3, #briefReportHeaderRight h3 { font-size: 16pt; }
+    #progressReport #reportHeader .logo {
+        max-width: 180px;
+        height: auto;
+        margin-bottom: 5px;
+    }
 
     #reportHeaderRight {
         text-align: center;
-        font-size: 9pt;
+        font-size: 0.9em;
         line-height: 1.4;
-        flex: 1;
     }
 
     #reportHeaderRight h3 {
-        font-size: 16pt;
+        font-size: 1.3em;
         margin: 0 0 5px 0;
         color: black;
     }
@@ -562,10 +563,7 @@ function saveSelectedSubjectsToRepo() {
     #progressReport, #briefReport {
         background-color: white;
         color: black;
-        padding-top: 1.5cm;
-        padding-left: 20px;
-        padding-right: 20px;
-        padding-bottom: 40px;
+        padding: 40px 20px;
         width: 95%;
         max-width: 650px;
         min-height: auto;
@@ -896,6 +894,10 @@ function saveSelectedSubjectsToRepo() {
             min-height: auto !important;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
+
+        #progressReport #reportHeader .logo, #briefReport #briefReportHeader .logo { width: 200px; height: 100px; }
+        #reportHeaderRight, #briefReportHeaderRight { font-size: 9pt; }
+        #reportHeaderRight h3, #briefReportHeaderRight h3 { font-size: 16pt; }
     }
   
 /* === SUBJECT LOCK ICON === */
@@ -957,8 +959,7 @@ function saveSelectedSubjectsToRepo() {
 
 <div id="initialPage" class="page">
     <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" alt="Namitete Secondary School Logo" class="logo">
-<h2 style="text-align: center;"><strong>NAMITETE SECONDARY SCHOOL</strong></h2>
-    
+    <h1><p style="font-size:28px;">NAMITETE SECONDARY SCHOOL</p></h1>
     <h2>EXAM PORTAL</h2>
     <label for="selectedForm">Select Form / Sankhani Kalasi</label>
     <select id="selectedForm">
@@ -1033,17 +1034,14 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="progressReport" class="page">
-    <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button><br><br>
+    <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
-    <header id="reportHeader" style="width: 85%;">
+    <header id="reportHeader" style="width: 100%;">
         <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" class="logo" alt="School Logo">
-        <div id="reportHeaderCenter">
+        <div id="reportHeaderRight">
             <div style="font-family: 'Times New Roman', Times, serif;">
- <div style="text-align: center;">
-<h1><p style="font-size:25px;">NAMITETE SECONDARY SCHOOL</p></h1>
- <div style="text-align: center;">
-
-               <p style="margin:5px 0; font-size: 14pt;"><strong>Private  Bag  3,<br>Namitete, Lilongwe.</strong><br>
+    <p style="margin:5px 0;"><h3>NAMITETE SECONDARY SCHOOL</h3>
+           <p style="margin:5px 0; font-size: 12pt;"><strong>Private Bag 3, Namitete.</strong><br>
             
            
         </div>
@@ -1068,12 +1066,12 @@ function saveSelectedSubjectsToRepo() {
         <table id="resultsTable">
             <thead>
                 <tr>
-                    <th style="width: 20%;"><strong>SUBJECT</strong></th>
-                    <th style="width: 10%;"><strong>SCORE</strong></th>
-                    <th style="width: 10%;"><strong>GRADE</strong></th>
-                    <th style="width: 10%;"><strong>POSITION</strong></th>
-                    <th style="width: 25%;"><strong>COMMENT</strong></th>
-                    <th style="width: 25%;"><strong>TEACHER</strong></th>
+                    <th style="width: 20%;">SUBJECT</th>
+                    <th style="width: 10%;">SCORE</th>
+                    <th style="width: 10%;">GRADE</th>
+                    <th style="width: 10%;">POSITION</th>
+                    <th style="width: 30%;">COMMENT</th>
+                    <th style="width: 20%;">TEACHER</th>
                 </tr>
             </thead>
             <tbody id="reportBody">
@@ -1092,7 +1090,7 @@ function saveSelectedSubjectsToRepo() {
     <div id="reportCommentsSection" style="margin-top:8px; text-align:left; width:100%;">
         <p style="margin:5px 0;"></strong>FORM TEACHER'S COMMENT:<strong><span id="reportTeacherComment" style="font-style:italic;"></span></p>
         <p style="margin:5px 0;"></strong>HEADTEACHER'S COMMENT:<strong><span id="reportHeadComment" style="font-style:italic;"></span></p>
-        <p style="margin:5px 0;"></strong>Next term opens on :<strong><span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>Fees for next term :<strong><span id="reportFees"></span></p></span><strong>KEY:</strong><span>
+        <p style="margin:5px 0;"></strong>Next term opens:<strong><span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>Fees for next term:<strong><span id="reportFees"></span></p></span><strong>KEY:</strong><span>
     </div>
 
     <div id="reportGradeKeySection" style="margin-top:10px; width:100%;">
@@ -1203,7 +1201,7 @@ function saveSelectedSubjectsToRepo() {
     </select>
 
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <button onclick="exportToExcel('scoresTable', 'Namitete_' + document.getElementById('sheetClassSelect').value + '_ScoreSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
+        <button onclick="exportToExcel('scoresTable', 'ScoreSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
         <button onclick="printSheet('scoreSheetView')" class="small-btn" style="max-width: 150px; margin: 5px;">Print Sheet</button>
     </div>
 
@@ -1423,7 +1421,7 @@ function saveSelectedSubjectsToRepo() {
     </select>
 
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <button onclick="exportToExcel('gradesTable', 'Namitete_' + document.getElementById('gradesClassSelect').value + '_GradeSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
+        <button onclick="exportToExcel('gradesTable', 'GradeSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
         <button onclick="printSheet('gradesPage')" class="small-btn" style="max-width: 150px; margin: 5px;">Print Sheet</button>
     </div>
 
