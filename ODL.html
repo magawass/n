@@ -275,7 +275,7 @@ function saveScoresAsExcel() {
         return;
     }
     
-    exportToExcel('dataEntryTable', `Namitete_Scores_${form}_${subject}`);
+    exportToExcel('dataEntryTable', `Scores_${form}_${subject}`);
 }
 
 function saveSelectedSubjectsToRepo() {
@@ -382,17 +382,13 @@ function saveSelectedSubjectsToRepo() {
         width: 95%;
         max-width: 480px;
         padding: 30px;
-        padding-bottom: 30px;
         background: #FFFFFF;
         border-radius: 12px;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         margin: 20px auto;
         text-align: center;
         height: auto;
-        min-height: auto;
         overflow-x: auto;
-        overflow-y: visible;
-        position: relative;
     }
 
     #initialPage { display: block; text-align: center; }
@@ -635,21 +631,12 @@ function saveSelectedSubjectsToRepo() {
 
     .hidden { display: none !important; }
 
-    /* === SURGICAL FIX: Widen pages that need full width === */
+    /* === SURGICAL FIX: Widen login & analysis selector to match sheet pages width === */
     #adminLoginPage,
     #analysisSelectorPage {
         width: auto !important;
         max-width: none !important;
         min-width: 100%;
-    }
-
-    /* === SURGICAL FIX: Data entry, sheets overview, admin home, uploads must not clip on mobile === */
-    #dataEntryPage,
-    #sheetsPage,
-    #adminHomePage,
-    #uploadsPage {
-        overflow-y: visible !important;
-        overflow-x: visible !important;
     }
 
     /* === SHEET PAGES: Expand to enclose all columns === */
@@ -679,110 +666,31 @@ function saveSelectedSubjectsToRepo() {
 
     /* Mobile Adjustments */
     @media (max-width: 480px) {
-        body { padding: 8px; min-height: 100vh; }
-        .page { padding: 12px 10px 20px 10px; width: 100%; max-width: 100% !important; min-height: auto; overflow: visible !important; }
-        #progressReport, #briefReport { padding: 20px 10px; width: 100%; max-width: 100% !important; min-height: auto !important; max-height: none !important; overflow: visible !important; }
+        body { padding: 10px; }
+        .page { padding: 15px; width: 98%; }
+        #progressReport, #briefReport { padding: 20px 10px; width: 98%; }
 
-        /* Sheet pages: full width on mobile, all columns scrollable */
+        /* Sheet pages: full width on mobile */
         #scoreSheetView,
         #gradesPage,
         #analysisPage {
             width: 100% !important;
-            max-width: 100% !important;
-            padding: 10px 5px 20px 5px !important;
-            overflow-x: auto !important;
-            overflow-y: visible !important;
+            padding: 10px !important;
         }
         #scoreSheetView .table-wrapper,
         #gradesPage .table-wrapper,
         #analysisPage .table-wrapper {
             overflow-x: auto !important;
-            overflow-y: visible !important;
             width: 100% !important;
-            min-width: 0;
         }
         #gradesTable, #analysisTable, #scoresTable {
             width: max-content !important;
-            min-width: 100% !important;
-            font-size: 0.7em !important;
+            font-size: 0.75em !important;
         }
         #gradesTable th, #gradesTable td,
         #analysisTable th, #analysisTable td,
         #scoresTable th, #scoresTable td {
-            padding: 4px 3px !important;
-            white-space: nowrap !important;
-        }
-
-        /* SURGICAL FIX: Data entry page - all buttons and sections visible to bottom */
-        #dataEntryPage {
-            max-width: 100% !important;
-            padding: 12px 8px 30px 8px !important;
-            overflow: visible !important;
-        }
-        #dataEntryPage #studentMarksPanel {
-            overflow-x: auto !important;
-            overflow-y: visible !important;
-        }
-        #dataEntryPage #studentMarksPanel .table-wrapper {
-            overflow-x: auto !important;
-            width: 100% !important;
-            min-width: 0;
-        }
-        #dataEntryTable {
-            width: max-content !important;
-            min-width: 100% !important;
-            font-size: 0.8em !important;
-        }
-        #dataEntryTable th, #dataEntryTable td {
-            white-space: nowrap !important;
             padding: 5px 4px !important;
-        }
-
-        /* SURGICAL FIX: Sheets overview - all buttons visible to bottom */
-        #sheetsPage {
-            max-width: 100% !important;
-            padding: 12px 8px 30px 8px !important;
-            overflow: visible !important;
-        }
-        #sheetsPage h2, #initialPage h2 { margin-top: 40px; }
-        #sheetsPage div[style*="display: flex"], #initialPage div[style*="display: flex"] {
-            flex-direction: column !important;
-            align-items: center !important;
-        }
-        #sheetsPage div[style*="display: flex"] button, #initialPage div[style*="display: flex"] button {
-            width: 100% !important;
-            max-width: 400px !important;
-            margin: 10px auto 0 auto !important;
-        }
-
-        /* SURGICAL FIX: Admin home, uploads page - all content visible */
-        #adminHomePage,
-        #uploadsPage {
-            max-width: 100% !important;
-            padding: 12px 8px 30px 8px !important;
-            overflow: visible !important;
-        }
-
-        /* Uploads page: stack flex row divs on mobile */
-        #uploadsPage div[style*="display: flex"] {
-            flex-direction: column !important;
-            align-items: center !important;
-            gap: 10px !important;
-        }
-        #uploadsPage div[style*="display: flex"] > div {
-            min-width: 100% !important;
-            width: 100% !important;
-        }
-        #uploadsPage div[style*="display: flex"] label {
-            text-align: center !important;
-        }
-        #uploadsPage div[style*="justify-content: space-around"] {
-            flex-direction: column !important;
-            align-items: stretch !important;
-        }
-        #uploadsPage div[style*="justify-content: space-around"] > div {
-            min-width: 100% !important;
-            width: 100% !important;
         }
 
         .info-row { flex-direction: column; }
@@ -796,27 +704,21 @@ function saveSelectedSubjectsToRepo() {
         .teacher-input-group label { flex-basis: auto; text-align: center !important; }
         .teacher-input-group input[type="text"] { flex-basis: auto; text-align: center !important; }
 
-        /* Ensure all buttons stack and are fully visible */
-        .page button {
-            max-width: 100% !important;
-            width: 100% !important;
+        /* Surgical Fix: Sheets Overview & Initial Page Mobile Layout Alignment */
+        #sheetsPage h2, #initialPage h2 { margin-top: 40px; }
+        #sheetsPage div[style*="display: flex"], #initialPage div[style*="display: flex"] {
+            flex-direction: column !important;
+            align-items: center !important;
         }
-        .small-btn {
-            max-width: 100% !important;
-            width: auto !important;
-            display: block !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
+        #sheetsPage div[style*="display: flex"] button, #initialPage div[style*="display: flex"] button {
+            width: 100% !important;
+            max-width: 400px !important;
+            margin: 10px auto 0 auto !important;
         }
     }
 
     /* Tablet breakpoint */
     @media (min-width: 481px) and (max-width: 767px) {
-        #progressReport, #briefReport { 
-            min-height: auto !important; 
-            max-height: none !important; 
-            overflow: visible !important; 
-        }
         #scoreSheetView,
         #gradesPage,
         #analysisPage {
@@ -869,11 +771,11 @@ function saveSelectedSubjectsToRepo() {
         color: black;
     }
 
-    /* Progress Report - scrollable on screen, fixed height only for print */
+    /* Force progress sheet to fit on ONE A4 page */
     #progressReport {
         padding: 20px 20px !important;
-        /* max-height and overflow:hidden removed for screen - allows full scrolling on mobile */
-        overflow: visible !important;
+        max-height: 1123px !important;
+        overflow: hidden !important;
     }
 
     /* Make table compact */
@@ -965,7 +867,6 @@ function saveSelectedSubjectsToRepo() {
         #progressReport, #briefReport {
             position: relative;
             overflow: hidden !important;
-            max-height: 1123px !important;
         }
 
         #resultsTable th, #resultsTable td,
@@ -1302,7 +1203,7 @@ function saveSelectedSubjectsToRepo() {
     </select>
 
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <button onclick="exportToExcel('scoresTable', 'Namitete_' + document.getElementById('sheetClassSelect').value + '_ScoreSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
+        <button onclick="exportToExcel('scoresTable', 'ScoreSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
         <button onclick="printSheet('scoreSheetView')" class="small-btn" style="max-width: 150px; margin: 5px;">Print Sheet</button>
     </div>
 
@@ -1522,7 +1423,7 @@ function saveSelectedSubjectsToRepo() {
     </select>
 
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <button onclick="exportToExcel('gradesTable', 'Namitete_' + document.getElementById('gradesClassSelect').value + '_GradeSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
+        <button onclick="exportToExcel('gradesTable', 'GradeSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
         <button onclick="printSheet('gradesPage')" class="small-btn" style="max-width: 150px; margin: 5px;">Print Sheet</button>
     </div>
 
@@ -2895,6 +2796,7 @@ function openFullPdf() {
         hideLoading();
     }).catch(error => {
         console.error("Error generating PDF:", error);
+        alert("Failed to generate PDF.");
         hideLoading();
     });
 }
@@ -4087,9 +3989,13 @@ function updateGradeComment(type, gradeKey, newComment) {
 async function shareProgressReportOnWhatsApp() {
     const studentName = document.getElementById('reportStudentName').textContent || 'Student';
     const examNumber = document.getElementById('reportExamNo').textContent || 'Unknown';
+    // Filename format: ExamNumber_StudentName.pdf
     const fileName = `${examNumber}_${studentName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
     const element = document.getElementById('progressReport');
-    if (!element) return;
+    if (!element) {
+        alert('Progress report not loaded.');
+        return;
+    }
 
     // Hide buttons before capture so they don't appear in the shared PDF
     const uiButtons = element.querySelectorAll('button');
@@ -4121,39 +4027,60 @@ async function shareProgressReportOnWhatsApp() {
         pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, canvas.width, canvas.height);
         const pdfBlob = pdf.output('blob');
         updateLoadingPercent(80);
-
-        // Auto-download the PDF
-        const url = URL.createObjectURL(pdfBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(function() { URL.revokeObjectURL(url); }, 10000);
-
-        // Auto-redirect to WhatsApp immediately - no popup, no alert
-        const waText = encodeURIComponent('Here is the progress report for ' + studentName + ' (Reg No: ' + examNumber + ') from Namitete Secondary School.');
-        setTimeout(function() {
-            var waLink = document.createElement('a');
-            waLink.href = 'https://api.whatsapp.com/send?text=' + waText;
-            waLink.setAttribute('target', '_blank');
-            waLink.setAttribute('rel', 'noopener noreferrer');
-            document.body.appendChild(waLink);
-            waLink.click();
-            document.body.removeChild(waLink);
-        }, 500);
-
-        updateLoadingPercent(100);
         hideLoading();
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+        // Try opening WhatsApp directly via deep link
+        const waText = encodeURIComponent('Here is the progress report for ' + studentName + ' (Reg No: ' + examNumber + ') from Namitete Secondary School.');
+        const waLink = 'https://api.whatsapp.com/send?text=' + waText;
+        
+        // Check if Web Share API is available for file sharing
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+            try {
+                await navigator.share({
+                    files: [pdfFile],
+                    title: `Progress Report - ${studentName}`,
+                    text: `Here is the progress report for ${studentName} (Exam No: ${examNumber}) from Namitete Secondary School.`
+                });
+                console.log('Shared via WhatsApp or system share');
+            } catch (shareError) {
+                // User cancelled or share failed - fall back to download
+                if (shareError.name !== 'AbortError') {
+                    console.error('Share failed, falling back to download:', shareError);
+                    fallbackDownload(pdfBlob, fileName, studentName);
+                }
+            }
+        } else {
+            // Browser doesn't support file sharing - download with instructions
+            fallbackDownload(pdfBlob, fileName, studentName);
+        }
     } catch (error) {
         // Restore buttons on error
         uiButtons.forEach((btn, i) => { btn.style.display = buttonSavedStyles[i]; });
         console.error('Share error:', error);
         hideLoading();
+        alert('Could not generate or share the PDF. Please try saving it first.');
     }
 }
 
+// Helper function for fallback download with WhatsApp instructions
+function fallbackDownload(pdfBlob, fileName, studentName) {
+    // Download the PDF first
+    const url = URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    // Open WhatsApp with a pre-filled message so the user can attach the downloaded PDF
+    const waText = encodeURIComponent('Here is the progress report for ' + studentName + ' from Namitete Secondary School. Please find the PDF attached.');
+    window.open('https://api.whatsapp.com/send?text=' + waText, '_blank');
+
+    alert('PDF saved as "' + fileName + '"!\n\nWhatsApp is now open. Tap the attachment (📎) icon in the chat and select the PDF from your Downloads to send it.');
+}
 </script>
 
 </body>
