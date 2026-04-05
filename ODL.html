@@ -666,9 +666,9 @@ function saveSelectedSubjectsToRepo() {
 
     /* Mobile Adjustments */
     @media (max-width: 480px) {
-        body { padding: 10px; }
-        .page { padding: 15px; width: 98%; }
-        #progressReport, #briefReport { padding: 20px 10px; width: 98%; }
+        body { padding: 10px; min-height: 100vh; }
+        .page { padding: 15px; width: 98%; min-height: auto; overflow: visible !important; }
+        #progressReport, #briefReport { padding: 20px 10px; width: 98%; min-height: auto !important; max-height: none !important; overflow: visible !important; }
 
         /* Sheet pages: full width on mobile */
         #scoreSheetView,
@@ -719,6 +719,11 @@ function saveSelectedSubjectsToRepo() {
 
     /* Tablet breakpoint */
     @media (min-width: 481px) and (max-width: 767px) {
+        #progressReport, #briefReport { 
+            min-height: auto !important; 
+            max-height: none !important; 
+            overflow: visible !important; 
+        }
         #scoreSheetView,
         #gradesPage,
         #analysisPage {
@@ -771,11 +776,11 @@ function saveSelectedSubjectsToRepo() {
         color: black;
     }
 
-    /* Force progress sheet to fit on ONE A4 page */
+    /* Progress Report - scrollable on screen, fixed height only for print */
     #progressReport {
         padding: 20px 20px !important;
-        max-height: 1123px !important;
-        overflow: hidden !important;
+        /* max-height and overflow:hidden removed for screen - allows full scrolling on mobile */
+        overflow: visible !important;
     }
 
     /* Make table compact */
@@ -867,6 +872,7 @@ function saveSelectedSubjectsToRepo() {
         #progressReport, #briefReport {
             position: relative;
             overflow: hidden !important;
+            max-height: 1123px !important;
         }
 
         #resultsTable th, #resultsTable td,
@@ -956,8 +962,8 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="initialPage" class="page">
-    <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" alt="Namitete Secondary School Logo" class="logo">
-<h2 style="text-align: center;"><strong>NAMITETE SECONDARY-ODL</strong></h2>
+    <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" alt="Namitete Secondary School Logo" class="logo">
+<h2 style="text-align: center;"><strong>NAMITETE SECONDARY SCHOOL</strong></h2>
     
     <h2>EXAM PORTAL</h2>
     <label for="selectedForm">Select Form / Sankhani Kalasi</label>
@@ -986,7 +992,7 @@ function saveSelectedSubjectsToRepo() {
     <button class="back-btn" onclick="handleBriefBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
     <header id="briefReportHeader" style="width: 100%;">
-        <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
+        <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" class="logo" alt="School Logo">
         <div id="briefReportHeaderRight">
             <h3>NAMITETE SECONDARY SCHOOL</h3>
             Private Bag 3, Namitete<br>
@@ -1036,7 +1042,7 @@ function saveSelectedSubjectsToRepo() {
     <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button><br><br>
 
     <header id="reportHeader" style="width: 85%;">
-        <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
+        <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" class="logo" alt="School Logo">
         <div id="reportHeaderCenter">
             <div style="font-family: 'Times New Roman', Times, serif;">
  <div style="text-align: center;">
@@ -1119,9 +1125,9 @@ function saveSelectedSubjectsToRepo() {
     <h2>Enter code to load and upload</h2>
     <input type="password" id="githubToken" placeholder="" style="margin-bottom: 20px;">
     <button onclick="openDataEntryAuth()">DATA ENTRY</button>
-    <button onclick="openUploadsAuth()">EDIT FILES,UPLOADS</button>
+    <button onclick="openUploadsAuth()">FILE UPLOADS</button>
     <button onclick="openSheetsPage()">PROGRESS,GRADE,ANALYSIS SHEETS</button>
-    <button onclick="openSubjectEntryMonitor()">SUBJECT SCORE ENTRY MONITOR👇</button>
+    <button onclick="openSubjectEntryMonitor()">Subject Score Entry Monitor Below</button>
    
     <select id="monitorClassSelect" onchange="openSubjectEntryMonitor()">
         <option value="">Collapsible</option>
@@ -1455,7 +1461,7 @@ function saveSelectedSubjectsToRepo() {
 <script>
 // --- GITHUB CONSTANTS ---
 const GITHUB_USER = 'magawass';
-const GITHUB_REPO = 'n2';
+const GITHUB_REPO = 'n';
 const CONFIG_FILE = 'config.json';
 const ADMIN_PASSWORD = '00n'; // Placeholder for security testing/local use
 
@@ -4073,13 +4079,23 @@ function fallbackDownload(pdfBlob, fileName, studentName) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Delay URL revocation so the download completes
+    setTimeout(function() { URL.revokeObjectURL(url); }, 10000);
 
-    // Open WhatsApp with a pre-filled message so the user can attach the downloaded PDF
-    const waText = encodeURIComponent('Here is the progress report for ' + studentName + ' from Namitete Secondary School. Please find the PDF attached.');
-    window.open('https://api.whatsapp.com/send?text=' + waText, '_blank');
+    // Open WhatsApp after a short delay to let the download begin
+    const waText = encodeURIComponent('Here is the progress report for ' + studentName + ' from Namitete Secondary School.');
+    setTimeout(function() {
+        // Use <a> click instead of window.open to avoid popup blockers
+        var waLink = document.createElement('a');
+        waLink.href = 'https://api.whatsapp.com/send?text=' + waText;
+        waLink.setAttribute('target', '_blank');
+        waLink.setAttribute('rel', 'noopener noreferrer');
+        document.body.appendChild(waLink);
+        waLink.click();
+        document.body.removeChild(waLink);
+    }, 1000);
 
-    alert('PDF saved as "' + fileName + '"!\n\nWhatsApp is now open. Tap the attachment (📎) icon in the chat and select the PDF from your Downloads to send it.');
+    alert('PDF downloaded as "' + fileName + '"!\n\nWhatsApp is opening now.\nIn WhatsApp, tap the attachment icon and select the PDF from your Downloads folder to send it.');
 }
 </script>
 
