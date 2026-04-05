@@ -275,7 +275,7 @@ function saveScoresAsExcel() {
         return;
     }
     
-    exportToExcel('dataEntryTable', `Scores_${form}_${subject}`);
+    exportToExcel('dataEntryTable', `Namitete_Scores_${form}_${subject}`);
 }
 
 function saveSelectedSubjectsToRepo() {
@@ -536,13 +536,13 @@ function saveSelectedSubjectsToRepo() {
     /* Progress Report Layout */
     #progressReport #reportHeader {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: flex-start;
-        margin-bottom: 10px;
+        margin-bottom: 18px;
         width: 100%;
     }
 
-    #progressReport #reportHeader .logo, #briefReport #briefReportHeader .logo { width: 200px; height: 100px; }
+    #progressReport #reportHeader .logo, #briefReport #briefReportHeader .logo { width: 130px; height: 100px; }
     #reportHeaderRight, #briefReportHeaderRight { font-size: 9pt; }
     #reportHeaderRight h3, #briefReportHeaderRight h3 { font-size: 16pt; }
 
@@ -550,6 +550,7 @@ function saveSelectedSubjectsToRepo() {
         text-align: center;
         font-size: 9pt;
         line-height: 1.4;
+        flex: 1;
     }
 
     #reportHeaderRight h3 {
@@ -561,7 +562,10 @@ function saveSelectedSubjectsToRepo() {
     #progressReport, #briefReport {
         background-color: white;
         color: black;
-        padding: 40px 20px;
+        padding-top: 1.5cm;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 40px;
         width: 95%;
         max-width: 650px;
         min-height: auto;
@@ -953,7 +957,8 @@ function saveSelectedSubjectsToRepo() {
 
 <div id="initialPage" class="page">
     <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" alt="Namitete Secondary School Logo" class="logo">
-    <h1><p style="font-size:28px;">NAMITETE SECONDARY SCHOOL</p></h1>
+<h2 style="text-align: center;"><strong>NAMITETE SECONDARY SCHOOL</strong></h2>
+    
     <h2>EXAM PORTAL</h2>
     <label for="selectedForm">Select Form / Sankhani Kalasi</label>
     <select id="selectedForm">
@@ -1028,14 +1033,17 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="progressReport" class="page">
-    <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
+    <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button><br><br>
 
-    <header id="reportHeader" style="width: 100%;">
+    <header id="reportHeader" style="width: 85%;">
         <img src="https://raw.githubusercontent.com/magawass/n/main/logo.png" class="logo" alt="School Logo">
-        <div id="reportHeaderRight">
+        <div id="reportHeaderCenter">
             <div style="font-family: 'Times New Roman', Times, serif;">
-    <p style="margin:5px 0;"><h3>NAMITETE SECONDARY SCHOOL</h3>
-           <p style="margin:5px 0; font-size: 12pt;"><strong>Private Bag 3, Namitete.</strong><br>
+ <div style="text-align: center;">
+<h1><p style="font-size:25px;">NAMITETE SECONDARY SCHOOL</p></h1>
+ <div style="text-align: center;">
+
+               <p style="margin:5px 0; font-size: 14pt;"><strong>Private  Bag  3,<br>Namitete, Lilongwe.</strong><br>
             
            
         </div>
@@ -1060,12 +1068,12 @@ function saveSelectedSubjectsToRepo() {
         <table id="resultsTable">
             <thead>
                 <tr>
-                    <th style="width: 20%;">SUBJECT</th>
-                    <th style="width: 10%;">SCORE</th>
-                    <th style="width: 10%;">GRADE</th>
-                    <th style="width: 10%;">POSITION</th>
-                    <th style="width: 30%;">COMMENT</th>
-                    <th style="width: 20%;">TEACHER</th>
+                    <th style="width: 20%;"><strong>SUBJECT</strong></th>
+                    <th style="width: 10%;"><strong>SCORE</strong></th>
+                    <th style="width: 10%;"><strong>GRADE</strong></th>
+                    <th style="width: 10%;"><strong>POSITION</strong></th>
+                    <th style="width: 25%;"><strong>COMMENT</strong></th>
+                    <th style="width: 25%;"><strong>TEACHER</strong></th>
                 </tr>
             </thead>
             <tbody id="reportBody">
@@ -1084,7 +1092,7 @@ function saveSelectedSubjectsToRepo() {
     <div id="reportCommentsSection" style="margin-top:8px; text-align:left; width:100%;">
         <p style="margin:5px 0;"></strong>FORM TEACHER'S COMMENT:<strong><span id="reportTeacherComment" style="font-style:italic;"></span></p>
         <p style="margin:5px 0;"></strong>HEADTEACHER'S COMMENT:<strong><span id="reportHeadComment" style="font-style:italic;"></span></p>
-        <p style="margin:5px 0;"></strong>Next term opens:<strong><span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>Fees for next term:<strong><span id="reportFees"></span></p></span><strong>KEY:</strong><span>
+        <p style="margin:5px 0;"></strong>Next term opens on :<strong><span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>Fees for next term :<strong><span id="reportFees"></span></p></span><strong>KEY:</strong><span>
     </div>
 
     <div id="reportGradeKeySection" style="margin-top:10px; width:100%;">
@@ -1195,7 +1203,7 @@ function saveSelectedSubjectsToRepo() {
     </select>
 
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <button onclick="exportToExcel('scoresTable', 'ScoreSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
+        <button onclick="exportToExcel('scoresTable', 'Namitete_' + document.getElementById('sheetClassSelect').value + '_ScoreSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
         <button onclick="printSheet('scoreSheetView')" class="small-btn" style="max-width: 150px; margin: 5px;">Print Sheet</button>
     </div>
 
@@ -1415,7 +1423,7 @@ function saveSelectedSubjectsToRepo() {
     </select>
 
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <button onclick="exportToExcel('gradesTable', 'GradeSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
+        <button onclick="exportToExcel('gradesTable', 'Namitete_' + document.getElementById('gradesClassSelect').value + '_GradeSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
         <button onclick="printSheet('gradesPage')" class="small-btn" style="max-width: 150px; margin: 5px;">Print Sheet</button>
     </div>
 
