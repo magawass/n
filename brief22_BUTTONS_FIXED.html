@@ -163,6 +163,73 @@ async function fetchClassDataFresh(form, token) {
     }
 }
 
+async function clearNamesForClass() {
+    const form = document.getElementById('clearNamesClassSelect').value;
+    const token = document.getElementById('githubToken').value;
+    const status = document.getElementById('clearNamesStatus');
+
+    if (!form) {
+        alert('Please select a Class first.');
+        return;
+    }
+    if (!token) {
+        alert('Authorization Code required. Please enter it above.');
+        return;
+    }
+
+    if (!confirm('⚠️ Are you sure you want to CLEAR ALL NAMES for ' + form.toUpperCase() + '?\n\nThis will erase student names for all students in this class.\nExam numbers, sex, DOB, and scores will be kept.\n\nThis action cannot be undone.')) {
+        return;
+    }
+
+    status.textContent = 'Loading class data...';
+    showLoading();
+    updateLoadingPercent(10);
+
+    try {
+        // Fetch latest class data from cloud
+        const classData = await fetchClassDataFresh(form, token);
+        if (!classData || classData.length === 0) {
+            hideLoading();
+            status.textContent = 'No student data found for ' + form.toUpperCase() + '.';
+            return;
+        }
+        updateLoadingPercent(30);
+
+        // Clear only the student names for each student
+        classData.forEach(student => {
+            student["STUDENT'S NAME"] = '';
+        });
+
+        updateLoadingPercent(50);
+
+        // Save updated data to cloud
+        const csvString = Papa.unparse(classData, { header: true, columns: ALL_HEADERS });
+        const currentSha = await getCSVFileSha(form, token);
+        updateLoadingPercent(70);
+
+        const base64Content = btoa(csvString);
+        const commitMessage = 'Clear all names: ' + form + ' (' + new Date().toLocaleString() + ')';
+        const result = await commitFile(form + '.csv', commitMessage, base64Content, currentSha, token, 'PUT');
+
+        if (result) {
+            currentDataSha[form] = result.content.sha;
+            currentClassData[form] = classData;
+            updateLoadingPercent(100);
+            status.textContent = 'All names cleared for ' + form.toUpperCase() + ' and saved to cloud.';
+            status.style.color = '#2ecc71';
+        } else {
+            status.textContent = 'Failed to save cleared names to cloud.';
+            status.style.color = '#e74c3c';
+        }
+    } catch (error) {
+        console.error('Clear names error:', error);
+        status.textContent = 'Error: ' + error.message;
+        status.style.color = '#e74c3c';
+    } finally {
+        hideLoading();
+    }
+}
+
 function togglePasswordAccess() {
     if (!currentConfig) {
         alert('Configuration not loaded. Please enter Authorization Code.');
@@ -454,6 +521,17 @@ function saveSelectedSubjectsToRepo() {
     #resultsTable td:first-child, #gradesTable td:first-child, #scoresTable td:nth-child(2), #briefResultsTable td:first-child { text-align: left; }
     #resultsTable td:not(:first-child), #gradesTable td:not(:first-child), #scoresTable td:not(:nth-child(2)), #briefResultsTable td:not(:first-child) { text-align: center; }
     #analysisTable td { text-align: center; }
+
+    /* --- SURGICAL FIX: ALIGNMENT & WIDTHS FOR SHEETS --- */
+    #analysisTable td:first-child { text-align: left !important; }
+    #gradesTable td:nth-child(3), #scoresTable td:nth-child(3) { text-align: left !important; }
+    
+    #gradesTable th:nth-child(1), #gradesTable td:nth-child(1),
+    #scoresTable th:nth-child(1), #scoresTable td:nth-child(1) { 
+        width: 1% !important; 
+        white-space: nowrap !important;
+        text-align: center !important;
+    }
 
     /* Progress Report Layout */
     #progressReport #reportHeader {
@@ -798,6 +876,13 @@ function saveSelectedSubjectsToRepo() {
         #reportDetails p, #briefReportDetails p {
             margin-bottom: 2px !important;
             font-size: 10pt !important;
+        }
+
+        /* Adjust Analysis Summary specifically for printing */
+        #analysisSummaryTable {
+            margin-top: 10px !important;
+            width: 100% !important;
+            max-width: none !important;
         }
     }
 
@@ -1224,6 +1309,24 @@ function saveSelectedSubjectsToRepo() {
 <p id="clearScoresStatus" style="font-size:11px;color:#7f8c8d;"></p>
 
 <hr style="margin: 20px 0; border: 1px solid #ccc;">
+<h3>Clear All Names Per Class</h3>
+<p style="font-size:0.9em; color:#e74c3c; margin-bottom:10px;">This will erase all student names for the selected class and update the cloud. Student exam numbers, sex, DOB, and scores will be kept.</p>
+<div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 15px;">
+    <div style="min-width: 200px;">
+        <label for="clearNamesClassSelect" style="text-align: center;">Select Class:</label>
+        <select id="clearNamesClassSelect">
+            <option value="">-- Select Class --</option>
+            <option value="form1">Form 1</option>
+            <option value="form2">Form 2</option>
+            <option value="form3">Form 3</option>
+            <option value="form4">Form 4</option>
+        </select>
+    </div>
+</div>
+<button onclick="clearNamesForClass()" style="background: #e74c3c;">🗑️ Clear All Names for Selected Class</button>
+<p id="clearNamesStatus" style="font-size:11px;color:#7f8c8d;"></p>
+
+<hr style="margin: 20px 0; border: 1px solid #ccc;">
 <h3>Lock / Unlock Score Entry</h3>
 
 <label for="lockSubjectSelect">Select Subject:</label>
@@ -1342,7 +1445,6 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="analysisPage" class="page">
-    <h2 id="analysisTitle">Class Analysis Report</h2>
     <button onclick="openAnalysisSelector()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
     <button onclick="printSheet('analysisPage')" class="small-btn" style="float: right; margin-top: 10px; max-width: 150px;">Print Analysis (Landscape)</button>
     <div id="analysisTableWrapper" class="table-wrapper"> </div>
@@ -2579,7 +2681,8 @@ async function loadResults(isStudentPortal) {
                 remark = gr.remark;
             }
 
-            const teacher = currentConfig.teachers[form][subject] || DEFAULT_TEACHER;
+            // SURGICAL FIX: Ensure assigned teacher name appears
+            const teacher = (currentConfig.teachers && currentConfig.teachers[form] && currentConfig.teachers[form][subject]) ? currentConfig.teachers[form][subject] : DEFAULT_TEACHER;
 
             const posMap = computeSubjectPositions(form, subject, data);
             const subjectPos = posMap[studentNumber] || '-';
@@ -2946,7 +3049,6 @@ function openAnalysisPage() {
         alert('Please select a class.');
         return;
     }
-    document.getElementById('analysisTitle').textContent = `${form.toUpperCase()} Class Analysis Report`;
     displayAnalysisSheet(form);
     goToPage('analysisPage');
 }
@@ -2971,7 +3073,13 @@ async function displayScoreSheet() {
 
     const isLowerForm = form === 'form1' || form === 'form2';
 
-    let html = '<table id="scoresTable"><thead><tr><th>POS</th><th>Exam No</th><th>Name</th><th>Sex</th>';
+    // Header for printing
+    let html = `<div class="sheet-header" style="text-align:center; margin-bottom:10px;">
+                    <h1 style="font-size: 20pt; margin:0;">NAMITETE SECONDARY SCHOOL</h1>
+                    <h2 style="font-size: 16pt; margin:5px 0;">${form.toUpperCase()} MARK SHEET</h2>
+                </div>`;
+
+    html += '<table id="scoresTable"><thead><tr><th>POS</th><th>Exam No</th><th>Name</th><th>Sex</th>';
     ALL_SUBJECTS.forEach(sub => { html += `<th>${getSubjectShortName(sub)}</th>`; });
     if (isLowerForm) {
         html += '<th>Total</th>';
@@ -3032,7 +3140,13 @@ async function displayGradesSheet() {
     const isUpperForm = form === 'form3' || form === 'form4';
     const finalColHeader = isUpperForm ? 'Aggregate' : 'Total Score';
 
-    let html = `<table id="gradesTable"><thead><tr><th>POSITION</th><th>Exam No</th><th>Name</th><th>Sex</th>`;
+    // Header for printing
+    let html = `<div class="sheet-header" style="text-align:center; margin-bottom:10px;">
+                    <h1 style="font-size: 20pt; margin:0;">NAMITETE SECONDARY SCHOOL</h1>
+                    <h2 style="font-size: 16pt; margin:5px 0;">${form.toUpperCase()} GRADE SHEET</h2>
+                </div>`;
+
+    html += `<table id="gradesTable"><thead><tr><th>POS</th><th>Exam No</th><th>Name</th><th>Sex</th>`;
     ALL_SUBJECTS.forEach(sub => { html += `<th>${getSubjectShortName(sub)}</th>`; });
     html += `<th>${finalColHeader}</th><th>Remark</th></tr></thead><tbody>`;
 
@@ -3101,6 +3215,7 @@ async function displayGradesSheet() {
     wrapper.innerHTML = html;      
 }
 
+// === SURGICAL FIX: ANALYSIS SHEET SUMMARY (Entered, Pass, Pass%, Fail, Fail%) ===
 async function displayAnalysisSheet(form) {
     const wrapper = document.getElementById('analysisTableWrapper');
     wrapper.innerHTML = '';
@@ -3115,123 +3230,111 @@ async function displayAnalysisSheet(form) {
     const gradeLabels = Object.keys(gradeKey);
 
     gradeLabels.sort((a, b) => {
-        if (isLowerForm) {
-            return gradeKey[b] - gradeKey[a];
-        } else {
-            return parseInt(a) - parseInt(b);
-        }
+        if (isLowerForm) return gradeKey[b] - gradeKey[a];
+        else return parseInt(a) - parseInt(b);
     });
 
+    // 1. PREPARE SUBJECT DATA
     const subjectMetrics = {};
     ALL_SUBJECTS.forEach(sub => {
         subjectMetrics[sub] = {
             pass: 0, fail: 0, entries: 0,
-            gradeCounts: Object.fromEntries(gradeLabels.map(l => [l, 0])),
-            mPass: 0, mFail: 0, mEntries: 0,
-            fPass: 0, fFail: 0, fEntries: 0
+            gradeCounts: Object.fromEntries(gradeLabels.map(l => [l, 0]))
         };
     });
 
-    data.forEach(student => {
+    // 2. PREPARE OVERALL CLASS SUMMARY COUNTERS
+    let mEntered = 0, mPass = 0, mFail = 0;
+    let fEntered = 0, fPass = 0, fFail = 0;
+
+    // Process every student for Summary and Subjects
+    for (const student of data) {
         const studentSex = getStudentSex(student);
+        const overallResult = computeFinalRemark(form, student); // Pass or Fail
+
+        if (studentSex === 'M') {
+            mEntered++;
+            if (overallResult === 'Pass') mPass++; else mFail++;
+        } else if (studentSex === 'F') {
+            fEntered++;
+            if (overallResult === 'Pass') fPass++; else fFail++;
+        }
+
+        // Subject Breakdown
         ALL_SUBJECTS.forEach(sub => {
             const rawScore = student[sub];
             const numericScore = parseInt(rawScore);
-
             if (rawScore !== '-' && rawScore !== 'N' && rawScore !== 'X' && !isNaN(numericScore)) {
                 const { grade } = getGradeAndRemark(form, numericScore);
                 subjectMetrics[sub].entries++;
                 subjectMetrics[sub].gradeCounts[grade]++;
-
-                if (studentSex === 'M') subjectMetrics[sub].mEntries++;
-                else if (studentSex === 'F') subjectMetrics[sub].fEntries++;
-
+                
                 if (isLowerForm) {
-                    if (['A', 'B', 'C', 'D'].includes(grade)) {
-                        subjectMetrics[sub].pass++;
-                        if (studentSex === 'M') subjectMetrics[sub].mPass++;
-                        else if (studentSex === 'F') subjectMetrics[sub].fPass++;
-                    } else if (grade === 'F') {
-                        subjectMetrics[sub].fail++;
-                        if (studentSex === 'M') subjectMetrics[sub].mFail++;
-                        else if (studentSex === 'F') subjectMetrics[sub].fFail++;
-                    }
+                    if (['A', 'B', 'C', 'D'].includes(grade)) subjectMetrics[sub].pass++;
+                    else if (grade === 'F') subjectMetrics[sub].fail++;
                 } else {
-                    if (['1', '2', '3', '4', '5', '6', '7', '8'].includes(grade)) {
-                        subjectMetrics[sub].pass++;
-                        if (studentSex === 'M') subjectMetrics[sub].mPass++;
-                        else if (studentSex === 'F') subjectMetrics[sub].fPass++;
-                    } else if (grade === '9') {
-                        subjectMetrics[sub].fail++;
-                        if (studentSex === 'M') subjectMetrics[sub].mFail++;
-                        else if (studentSex === 'F') subjectMetrics[sub].fFail++;
-                    }
+                    if (parseInt(grade) <= 8) subjectMetrics[sub].pass++;
+                    else if (grade === '9') subjectMetrics[sub].fail++;
                 }
             }
         });
-    });
+    }
 
-    let html = '<table id="analysisTable"><thead><tr><th>Subject</th>';
+    // 3. BUILD SUBJECT ANALYSIS TABLE
+    let html = `<div class="sheet-header" style="text-align:center; margin-bottom:10px;">
+                    <h1 style="font-size: 20pt; margin:0;">NAMITETE SECONDARY SCHOOL</h1>
+                    <h2 style="font-size: 16pt; margin:5px 0;">${form.toUpperCase()} ANALYSIS REPORT</h2>
+                </div>`;
+
+    html += '<table id="analysisTable"><thead><tr><th>Subject</th>';
     gradeLabels.forEach(label => { html += `<th>${label}</th>`; });
-    html += '<th>Pass %</th><th>Fail %</th><th>M Pass %</th><th>F Pass %</th><th>Entries</th></tr></thead><tbody>';
+    html += '<th>Pass %</th><th>Fail %</th><th>Entries</th></tr></thead><tbody>';
 
     const sortedSubjects = [...ALL_SUBJECTS].sort();
-    let totalMPass = 0, totalMEntries = 0, totalFPass = 0, totalFEntries = 0;
-    let totalMFail = 0, totalFFail = 0;
-
     sortedSubjects.forEach(sub => {
         const metrics = subjectMetrics[sub];
         if (metrics.entries > 0) {
             let rowHtml = `<tr><td>${sub}</td>`;
             gradeLabels.forEach(label => { rowHtml += `<td>${metrics.gradeCounts[label] || 0}</td>`; });
-            const passPercent = ((metrics.pass / metrics.entries) * 100).toFixed(1);
-            const failPercent = (100 - parseFloat(passPercent)).toFixed(1);
-            const mPassPercent = metrics.mEntries > 0 ? ((metrics.mPass / metrics.mEntries) * 100).toFixed(1) + '%' : '-';
-            const fPassPercent = metrics.fEntries > 0 ? ((metrics.fPass / metrics.fEntries) * 100).toFixed(1) + '%' : '-';
-            rowHtml += `<td>${passPercent}%</td><td>${failPercent}%</td><td>${mPassPercent}</td><td>${fPassPercent}</td><td>${metrics.entries}</td></tr>`;
+            const pPct = ((metrics.pass / metrics.entries) * 100).toFixed(1);
+            const fPct = (100 - parseFloat(pPct)).toFixed(1);
+            rowHtml += `<td>${pPct}%</td><td>${fPct}%</td><td>${metrics.entries}</td></tr>`;
             html += rowHtml;
-            totalMPass += metrics.mPass;
-            totalMEntries += metrics.mEntries;
-            totalFPass += metrics.fPass;
-            totalFEntries += metrics.fEntries;
-            totalMFail += metrics.mFail;
-            totalFFail += metrics.fFail;
         } else {
              let rowHtml = `<tr><td>${sub}</td>`;
              gradeLabels.forEach(() => { rowHtml += `<td>0</td>`; });
-             rowHtml += `<td>0.0%</td><td>0.0%</td><td>-</td><td>-</td><td>0</td></tr>`;
+             rowHtml += `<td>0.0%</td><td>0.0%</td><td>0</td></tr>`;
              html += rowHtml;
         }
     });
-
     html += '</tbody></table>';
 
-    // Calculate summary statistics
-    const totalEntries = totalMEntries + totalFEntries;
-    const totalPass = totalMPass + totalFPass;
-    const totalFail = totalMFail + totalFFail;
+    // 4. CALCULATE SUMMARY PERCENTAGES
+    const tEntered = mEntered + fEntered;
+    const tPass = mPass + fPass;
+    const tFail = mFail + fFail;
 
-    const boysPassPercent = totalMEntries > 0 ? ((totalMPass / totalMEntries) * 100).toFixed(1) : '0.0';
-    const boysFailPercent = totalMEntries > 0 ? ((totalMFail / totalMEntries) * 100).toFixed(1) : '0.0';
-    const girlsPassPercent = totalFEntries > 0 ? ((totalFPass / totalFEntries) * 100).toFixed(1) : '0.0';
-    const girlsFailPercent = totalFEntries > 0 ? ((totalFFail / totalFEntries) * 100).toFixed(1) : '0.0';
-    const totalPassPercent = totalEntries > 0 ? ((totalPass / totalEntries) * 100).toFixed(1) : '0.0';
-    const totalFailPercent = totalEntries > 0 ? ((totalFail / totalEntries) * 100).toFixed(1) : '0.0';
+    const mPP = mEntered > 0 ? ((mPass / mEntered) * 100).toFixed(1) : '0.0';
+    const mFP = mEntered > 0 ? ((mFail / mEntered) * 100).toFixed(1) : '0.0';
+    const fPP = fEntered > 0 ? ((fPass / fEntered) * 100).toFixed(1) : '0.0';
+    const fFP = fEntered > 0 ? ((fFail / fEntered) * 100).toFixed(1) : '0.0';
+    const tPP = tEntered > 0 ? ((tPass / tEntered) * 100).toFixed(1) : '0.0';
+    const tFP = tEntered > 0 ? ((tFail / tEntered) * 100).toFixed(1) : '0.0';
 
-    // Add summary table below the main table (less than half width)
+    // 5. BUILD THE SUMMARY TABLE (SURGICAL FIX)
     html += `
     <style>
         #analysisSummaryTable {
-            width: 45%;
-            max-width: 350px;
+            width: 50% !important;
             border-collapse: collapse;
-            font-size: 0.9em;
-            border: 1px solid black;
+            font-size: 0.95em;
+            border: 2px solid black;
             margin-top: 15px;
+            background: white;
         }
         #analysisSummaryTable th, #analysisSummaryTable td {
             border: 1px solid black;
-            padding: 8px 6px;
+            padding: 10px 8px;
             text-align: center;
         }
         #analysisSummaryTable th {
@@ -3240,19 +3343,15 @@ async function displayAnalysisSheet(form) {
             font-weight: 600;
         }
         #analysisSummaryTable td:first-child {
-            font-weight: 600;
+            font-weight: bold;
             text-align: left;
-            padding-left: 10px;
-        }
-        #analysisSummaryTable tr:nth-child(2) td {
-            height: 10px;
-            background: #f9f9f9;
+            background: #f8f9fa;
         }
     </style>
     <table id="analysisSummaryTable">
         <thead>
             <tr>
-                <th></th>
+                <th>SEX</th>
                 <th>Entered</th>
                 <th>Pass</th>
                 <th>Pass%</th>
@@ -3262,36 +3361,28 @@ async function displayAnalysisSheet(form) {
         </thead>
         <tbody>
             <tr>
-                <td>BOYS</td>
-                <td>${totalMEntries}</td>
-                <td>${totalMPass}</td>
-                <td>${boysPassPercent}%</td>
-                <td>${totalMFail}</td>
-                <td>${boysFailPercent}%</td>
+                <td>BOYS (M)</td>
+                <td>${mEntered}</td>
+                <td>${mPass}</td>
+                <td>${mPP}%</td>
+                <td>${mFail}</td>
+                <td>${mFP}%</td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>GIRLS (F)</td>
+                <td>${fEntered}</td>
+                <td>${fPass}</td>
+                <td>${fPP}%</td>
+                <td>${fFail}</td>
+                <td>${fFP}%</td>
             </tr>
-            <tr>
-                <td>GIRLS</td>
-                <td>${totalFEntries}</td>
-                <td>${totalFPass}</td>
-                <td>${girlsPassPercent}%</td>
-                <td>${totalFFail}</td>
-                <td>${girlsFailPercent}%</td>
-            </tr>
-            <tr>
+            <tr style="background:#f1f1f1; font-weight:bold;">
                 <td>TOTAL</td>
-                <td>${totalEntries}</td>
-                <td>${totalPass}</td>
-                <td>${totalPassPercent}%</td>
-                <td>${totalFail}</td>
-                <td>${totalFailPercent}%</td>
+                <td>${tEntered}</td>
+                <td>${tPass}</td>
+                <td>${tPP}%</td>
+                <td>${tFail}</td>
+                <td>${tFP}%</td>
             </tr>
         </tbody>
     </table>`;
@@ -3473,7 +3564,10 @@ async function generateAllProgressReports() {
             const rawScore = student[subject];
             const gr = getGradeAndRemark(form, rawScore);
             const pos = subjectPositions[subject][studentNumber] || '-';
-            const teacher = currentConfig.teachers[form][subject] || DEFAULT_TEACHER;
+            
+            // SURGICAL FIX: Pull teacher name from currentConfig
+            const teacher = (currentConfig.teachers && currentConfig.teachers[form] && currentConfig.teachers[form][subject]) ? currentConfig.teachers[form][subject] : DEFAULT_TEACHER;
+            
             const remark = (form === 'form1' || form === 'form2') ? lowerFormRemarkFromGrade(gr.grade) : gr.remark;
 
             const row = reportBody.insertRow();
