@@ -56,16 +56,16 @@
     },
     "form2": {
       "Agriculture": "mtonga",
-      "Bible Knowledge": "-",
-      "Biology": "-",
-      "Chemistry": "-",
-      "Chichewa": "-",
-      "English": "-",
-      "Geography": "-",
-      "History": "-",
-      "Mathematics": "-",
-      "Physics": "-",
-      "Social/Life": "-"
+      "Bible Knowledge": "Jere",
+      "Biology": "Banda",
+      "Chemistry": "Jekapu",
+      "Chichewa": "Masoambeta",
+      "English": "Thom",
+      "Geography": "Pandakwao",
+      "History": "Mthunzi",
+      "Mathematics": "Daimoni",
+      "Physics": "Mkhweza",
+      "Social/Life": "Namfuko"
     },
     "form3": {
       "Agriculture": "-",
