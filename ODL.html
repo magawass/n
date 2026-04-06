@@ -767,25 +767,21 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="progressReport" class="page">
-    <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button><br><br>
+    <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
-    <header id="reportHeader" style="width: 85%;">
+    <header id="reportHeader" style="width: 100%;">
         <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
- <div id="reportHeaderCenter">
-<div style="font-family: 'Times New Roman', Times, serif;">
-<div style="text-align: center;">
-<h1><p style="font-size:25px;">NAMITETE SECONDARY SCHOOL</p></h1>
- <div style="text-align: center;">
-
-               <p style="margin:5px 0; font-size: 14pt;"><strong>Private  Bag  3,<br>Namitete, Lilongwe.</strong><br>
-
-
+        <div id="reportHeaderRight">
+            <h3>NAMITETE SECONDARY SCHOOL</h3>
+            Private Bag 3,<br>
+            Namitete,<br>
+            Lilongwe.
         </div>
     </header>
 
     <hr style="border-top: 2px solid black; margin: 10px 0;">
     <div style="text-align: center;">
-      <p style="font-size: 10px;"> <h2 style="margin: 0;color: black;"><strong>STUDENT PROGRESS REPORT</strong></h2>
+      <p style="font-size: 10px;"> <h2 style="margin: 0;color: black;"><strong>PROGRESS REPORT</strong></h2>
     </div>
 
     <div id="reportDetails">
@@ -802,12 +798,12 @@ function saveSelectedSubjectsToRepo() {
         <table id="resultsTable">
             <thead>
                 <tr>
-                    <th style="width: 20%;"><strong>SUBJECT</strong></th>
-                    <th style="width: 10%;"><strong>SCORE</strong></th>
-                    <th style="width: 10%;"><strong>GRADE</strong></th>
-                    <th style="width: 10%;"><strong>POSITION</strong></th>
-                    <th style="width: 25%;"><strong>COMMENT</strong></th>
-                    <th style="width: 25%;"><strong>TEACHER</strong></th>
+                    <th style="width: 20%;">SUBJECT</th>
+                    <th style="width: 10%;">SCORE</th>
+                    <th style="width: 10%;">GRADE</th>
+                    <th style="width: 10%;">POSITION</th>
+                    <th style="width: 30%;">REMARKS</th>
+                    <th style="width: 20%;">TEACHER</th>
                 </tr>
             </thead>
             <tbody id="reportBody">
@@ -817,16 +813,15 @@ function saveSelectedSubjectsToRepo() {
 
     <div id="summaryAndKeyWrapper">
         <div id="reportSummary" style="width:100%;">
-
-            <div><p style="margin:5px 0; font-size: 11pt;">POSITION: <strong><span id="reportPosition"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OUT OF: <strong><span id="reportTotalStudents"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STATUS: <strong><span id="reportStatus"></span></strong></div>
- 
+            <br>
+            <div>POSITION in class: <strong><span id="reportPosition"></span></strong>&nbsp;&nbsp;OUT OF: <strong><span id="reportTotalStudents"></span></strong>&nbsp;&nbsp;STATUS: <strong><span id="reportStatus"></span></strong></div>
         </div>
     </div>
 
-   <div id="reportCommentsSection" style="margin-top:8px; text-align:left; width:100%;">
-        <p style="margin:5px 0;"></strong>FORM TEACHER'S COMMENT:<strong><span id="reportTeacherComment" style="font-style:italic;"></span></p>
-        <p style="margin:5px 0;"></strong>HEADTEACHER'S COMMENT:<strong><span id="reportHeadComment" style="font-style:italic;"></span></p>
-        <p style="margin:5px 0;"></strong>Next term opens on :<strong><span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>Fees for next term :<strong><span id="reportFees"></span></p></span><strong>KEY:</strong><span>
+    <div id="reportCommentsSection" style="margin-top:10px; text-align:left; width:100%;">
+        <p style="margin:5px 0;"><strong>FORM TEACHER'S COMMENT:</strong> <span id="reportTeacherComment" style="font-style:italic; font-weight:bold;"></span></p>
+        <p style="margin:5px 0;"><strong>HEADTEACHER'S COMMENT:</strong> <span id="reportHeadComment" style="font-style:italic; font-weight:bold;"></span></p>
+        <p style="margin:5px 0;"><strong>NEXT TERM OPENS:</strong> <span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;<strong>FEES:</strong> <span id="reportFees"></span></p>
     </div>
 
     <div id="reportGradeKeySection" style="margin-top:10px; width:100%; text-align:left;">
