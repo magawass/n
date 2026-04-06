@@ -407,6 +407,7 @@ function saveSelectedSubjectsToRepo() {
 
     #gradeKeyPlaceholder {
         width: 100%;
+        text-align: left;
     }
 
     #reportGradeKeyTable {
@@ -414,7 +415,7 @@ function saveSelectedSubjectsToRepo() {
         border-collapse: collapse;
         font-size: 8pt;
         border: 1px solid black;
-        margin: 0 auto;
+        margin: 0;
     }
 
     #reportGradeKeyTable th, #reportGradeKeyTable td {
@@ -690,8 +691,8 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="initialPage" class="page">
-    <img src="https://raw.githubusercontent.com/magawass/m/main/logo.png" alt="Namitete Secondary School Logo" class="logo">
-    <h1><p style="font-size:28px;">Namitete Secondary School</p></h1>
+    <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" alt="Namitete Secondary School Logo" class="logo">
+    <h1><p style="font-size:28px;">NAMITETE SECONDARY-ODL</p></h1>
     <h2>EXAM PORTAL</h2>
     <label for="selectedForm">Select Form / Sankhani Kalasi</label>
     <select id="selectedForm">
@@ -702,7 +703,7 @@ function saveSelectedSubjectsToRepo() {
       <option value="form4">Form 4</option>
     </select>
     <label for="studentNumberInput">Enter Exam Number / Lowetsani nambala ya mayeso</label>
-    <input type="text" id="studentNumberInput" placeholder="e.g. J047 or M047">
+    <input type="text" id="studentNumberInput" placeholder=" ">
     <label for="passwordInput">Enter Password / Lembani nambala ya chinsinsi</label>
     <input type="password" id="passwordInput" placeholder="Here / Pano">
 
@@ -712,17 +713,17 @@ function saveSelectedSubjectsToRepo() {
     </div>
 
     <button onclick="openAdminLogin()">LOGIN</button>
-    <p style="font-size:11px; margin-top: 15px; color: #7f8c8d;">Designed by CHIKUMBUTSO LUBAINI-0994039325. All rights reserved.</p>
+    <p style="font-size:11px; margin-top: 15px; color: #7f8c8d;">Designed by CHIKUMBUTSO LUBAINI-0 994 039 325. All rights reserved.</p>
 </div>
 
 <div id="briefReport" class="page">
     <button class="back-btn" onclick="handleBriefBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
     <header id="briefReportHeader" style="width: 100%;">
-        <img src="https://raw.githubusercontent.com/magawass/m/main/logo.png" class="logo" alt="School Logo">
+        <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
         <div id="briefReportHeaderRight">
             <h3>NAMITETE SECONDARY SCHOOL</h3>
-            P.O. Box 138,<br>
+            Private Bag 3,<br>
             Namitete,<br>
             Lilongwe.
         </div>
@@ -769,10 +770,10 @@ function saveSelectedSubjectsToRepo() {
     <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
     <header id="reportHeader" style="width: 100%;">
-        <img src="https://raw.githubusercontent.com/magawass/m/main/logo.png" class="logo" alt="School Logo">
+        <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
         <div id="reportHeaderRight">
             <h3>NAMITETE SECONDARY SCHOOL</h3>
-            P.O. Box 138,<br>
+            Private Bag 3,<br>
             Namitete,<br>
             Lilongwe.
         </div>
@@ -823,7 +824,7 @@ function saveSelectedSubjectsToRepo() {
         <p style="margin:5px 0;"><strong>NEXT TERM OPENS:</strong> <span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;<strong>FEES:</strong> <span id="reportFees"></span></p>
     </div>
 
-    <div id="reportGradeKeySection" style="margin-top:10px; width:100%;">
+    <div id="reportGradeKeySection" style="margin-top:10px; width:100%; text-align:left;">
         <div id="gradeKeyPlaceholder">
         </div>
     </div>
@@ -899,6 +900,7 @@ function saveSelectedSubjectsToRepo() {
                     <tr style="background:#ecf0f1;">
                         <th style="border:1px solid #cc6600;padding:10px;">Exam Number</th>
                         <th style="border:1px solid #cc6600;padding:10px;">Name</th>
+                        <th style="border:1px solid #cc6600;padding:10px;width:40px;">SEX</th>
                         <th style="border:1px solid #cc6600;padding:10px;">Score</th>
                     </tr>
                 </thead>
@@ -915,7 +917,7 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="scoreSheetView" class="page">
-    <h2>Mark Sheet</h2>
+    <h2 id="markSheetHeader">NAMITETE SECONDARY SCHOOL - Mark Sheet - <span id="markSheetForm"></span> - Term <span id="markSheetTerm"></span></h2>
 <input type="text" id="scoreSearchInput" placeholder="Search student..." onkeyup="filterScoreSheet()" style="max-width:300px;">
 
     <button onclick="openDataEntryPage()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
@@ -950,6 +952,8 @@ function saveSelectedSubjectsToRepo() {
         <option value="2">Term 2</option>
         <option value="3">Term 3</option>
     </select>
+    <label for="reportYearInput">Academic Year:</label>
+    <input type="text" id="reportYearInput" placeholder="e.g. 2025">
     <label for="generalCommentInput">General Report Comment:</label>
     <textarea id="generalCommentInput" rows="3" placeholder="Enter comment for all reports..."></textarea>
 
@@ -998,9 +1002,28 @@ function saveSelectedSubjectsToRepo() {
         <option value="form4">Form 4</option>
     </select>
     <input type="text" id="manualStudentName" placeholder="Full Student Name">
-    <input type="text" id="manualExamNumber" placeholder="Exam Number (e.g. J047)">
+    <input type="text" id="manualExamNumber" placeholder="Exam Number ( )">
+    <input type="text" id="manualSex" placeholder="Sex (M/F)">
     <input type="text" id="manualDOB" placeholder="Date of Birth (e.g. 2005-12-01)">
     <button onclick="addStudentManually()" style="background: #17a2b8;">Add Student to List</button>
+    <button onclick="overwriteStudentData()" style="background: #e67e22;">Overwrite Existing Student</button>
+
+    <hr style="margin: 20px 0; border: 1px solid #ccc;">
+    <h3>Clear Scores</h3>
+    <p style="font-size: 0.9em; color: #7f8c8d; margin-bottom: 10px;">Clear scores while keeping student details intact.</p>
+    <label for="clearScoresClassSelect">Select Class:</label>
+    <select id="clearScoresClassSelect">
+        <option value="">--Select Class--</option>
+        <option value="form1">Form 1</option>
+        <option value="form2">Form 2</option>
+        <option value="form3">Form 3</option>
+        <option value="form4">Form 4</option>
+    </select>
+    <label for="clearSubjectSelect">Select Subject (leave empty to clear all):</label>
+    <select id="clearSubjectSelect">
+        <option value="">-- All Subjects --</option>
+    </select>
+    <button onclick="clearScoresForClass()" style="background: #e74c3c;">Clear Scores</button>
 
     <hr style="margin: 20px 0; border: 1px solid #ccc;">
     <label for="deleteDropdown">Select File to Delete:</label>
@@ -1088,7 +1111,7 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="gradesPage" class="page">
-    <h2>Grades Sheet</h2>
+    <h2 id="gradeSheetHeader">NAMITETE SECONDARY SCHOOL - Grade Sheet - <span id="gradeSheetForm"></span> - Term <span id="gradeSheetTerm"></span></h2>
 <input type="text" id="gradeSearchInput" placeholder="Search student..." onkeyup="filterGradeSheet()" style="max-width:300px;">
 
     <button onclick="openSheetsPage()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
@@ -1103,7 +1126,7 @@ function saveSelectedSubjectsToRepo() {
     </select>
 
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <button onclick="exportToExcel('gradesTable', 'GradeSheet')" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
+        <button onclick="exportGradeSheetWithFilename()" class="small-btn" style="background: #28a745; margin: 5px;">Export to Excel</button>
         <button onclick="printSheet('gradesPage')" class="small-btn" style="max-width: 150px; margin: 5px;">Print Sheet</button>
     </div>
 
@@ -1127,7 +1150,7 @@ function saveSelectedSubjectsToRepo() {
 </div>
 
 <div id="analysisPage" class="page">
-    <h2 id="analysisTitle">Class Analysis Report</h2>
+    <h2 id="analysisTitle">NAMITETE SECONDARY SCHOOL - Form 2 Class Analysis Report</h2>
     <button onclick="openAnalysisSelector()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
     <button onclick="printSheet('analysisPage')" class="small-btn" style="float: right; margin-top: 10px; max-width: 150px;">Print Analysis (Landscape)</button>
     <div id="analysisTableWrapper" class="table-wrapper"> </div>
@@ -1136,7 +1159,7 @@ function saveSelectedSubjectsToRepo() {
 <script>
 // --- GITHUB CONSTANTS ---
 const GITHUB_USER = 'magawass';
-const GITHUB_REPO = 'ExApp';
+const GITHUB_REPO = 'n2';
 const CONFIG_FILE = 'config.json';
 const ADMIN_PASSWORD = '00n'; // Placeholder for security testing/local use
 
@@ -1163,7 +1186,7 @@ const SUBJECT_MAP = {
     "Social/Life": "S/Life"
 };
 const ALL_SUBJECTS = Object.keys(SUBJECT_MAP); // Full names used for internal logic
-const BASE_HEADERS = ["STUDENT'S NAME", "Exam Number", "Date of Birth"];
+const BASE_HEADERS = ["STUDENT'S NAME", "Exam Number", "Sex", "Date of Birth"];
 const ALL_HEADERS = [...BASE_HEADERS, ...ALL_SUBJECTS];
 const ALL_CLASSES = ['form1', 'form2', 'form3', 'form4'];
 const DEFAULT_TEACHER = '-';
@@ -1359,6 +1382,7 @@ function getDefaultConfig() {
     return {
         locks: {},
         term: '3',
+        year: '2025',
         generalComment: 'Excellent effort. Keep up the hard work.',
         nextTermOpens: '',
         fees: '',
@@ -1810,6 +1834,9 @@ async function initializeConfig(token) {
     if(document.getElementById('reportTermSelect')) {
          document.getElementById('reportTermSelect').value = currentConfig.term;
     }
+    if(document.getElementById('reportYearInput')) {
+        document.getElementById('reportYearInput').value = currentConfig.year || '2025';
+    }
     if(document.getElementById('generalCommentInput')) {
         document.getElementById('generalCommentInput').value = currentConfig.generalComment;
     }
@@ -1836,6 +1863,7 @@ async function handleSaveConfig() {
 
     const newConfig = {
         term: document.getElementById('reportTermSelect').value,
+        year: document.getElementById('reportYearInput').value || '2025',
         generalComment: document.getElementById('generalCommentInput').value,
         nextTermOpens: document.getElementById('nextTermOpensInput').value,
         fees: document.getElementById('feesInput').value,
@@ -2211,6 +2239,7 @@ async function openUploadsAuth() {
     await initializeConfig(token);
     await refreshFileList();
     populateGradeEditors();
+    populateClearSubjectSelect();
     updatePasswordAccessStatus();
     goToPage('uploadsPage');
 }
@@ -2306,6 +2335,8 @@ async function loadResults(isStudentPortal) {
         document.getElementById('reportForm').textContent = form.toUpperCase();
         document.getElementById('reportExamNo').textContent = studentNumber;
         document.getElementById('reportTerm').textContent = currentConfig.term;
+        document.getElementById('reportYear').textContent = currentConfig.year || '2025';
+        document.getElementById('reportSex').textContent = student["Sex"] || '-';
 
         const reportBody = document.getElementById('reportBody');
         reportBody.innerHTML = '';
@@ -2399,7 +2430,8 @@ function handleProgressBack() {
 
 function openFullPdf() {
     const studentName = document.getElementById('reportStudentName').textContent;
-    const fileName = studentName.replace(/ /g, '_') + '_Report.pdf';
+    const examNo = document.getElementById('reportExamNo').textContent;
+    const fileName = `${examNo}_${studentName.replace(/ /g, '_')}_Report.pdf`;
 
     const element = document.getElementById('progressReport');
 
@@ -2708,9 +2740,13 @@ async function displayScoreSheet() {
         return;
     }
 
+    // Update header with form and term
+    document.getElementById('markSheetForm').textContent = form.toUpperCase().replace('FORM', 'Form ');
+    document.getElementById('markSheetTerm').textContent = currentConfig ? currentConfig.term : '-';
+
     const isLowerForm = form === 'form1' || form === 'form2';
 
-    let html = '<table id="scoresTable"><thead><tr><th>POS</th><th>Exam No</th><th>Name</th>';
+    let html = '<table id="scoresTable"><thead><tr><th style="width:5%;">POS</th><th style="width:10%;">Exam No</th><th style="width:20%;">Name</th><th style="width:5%;">SEX</th>';
     ALL_SUBJECTS.forEach(sub => { html += `<th>${getSubjectShortName(sub)}</th>`; });
     if (isLowerForm) {
         html += '<th>Total</th>';
@@ -2736,7 +2772,7 @@ async function displayScoreSheet() {
         lastPos = pos;
 
         let totalScore = 0;
-        let rowHtml = `<tr><td>${pos}</td><td>${student["Exam Number"]}</td><td>${student["STUDENT'S NAME"]}</td>`;
+        let rowHtml = `<tr><td>${pos}</td><td>${student["Exam Number"]}</td><td>${student["STUDENT'S NAME"]}</td><td>${student["Sex"] || '-'}</td>`;
 
         ALL_SUBJECTS.forEach(sub => {
             const rawScore = student[sub] || '-';
@@ -2768,10 +2804,14 @@ async function displayGradesSheet() {
         return;
     }
 
+    // Update header with form and term
+    document.getElementById('gradeSheetForm').textContent = form.toUpperCase().replace('FORM', 'Form ');
+    document.getElementById('gradeSheetTerm').textContent = currentConfig ? currentConfig.term : '-';
+
     const isUpperForm = form === 'form3' || form === 'form4';
     const finalColHeader = isUpperForm ? 'Aggregate' : 'Total Score';
 
-    let html = `<table id="gradesTable"><thead><tr><th>POSITION</th><th>Exam No</th><th>Name</th>`;
+    let html = `<table id="gradesTable"><thead><tr><th style="width:5%;">POS</th><th style="width:10%;">Exam No</th><th style="width:18%;">Name</th><th style="width:5%;">SEX</th>`;
     ALL_SUBJECTS.forEach(sub => { html += `<th>${getSubjectShortName(sub)}</th>`; });
     html += `<th>${finalColHeader}</th><th>Remark</th></tr></thead><tbody>`;
 
@@ -2807,7 +2847,7 @@ async function displayGradesSheet() {
     studentsWithMetrics.forEach(({ student, metrics }) => {
         const position = student.__position;
 
-        let rowHtml = `<tr><td>${position}</td><td>${student["Exam Number"]}</td><td>${student["STUDENT'S NAME"]}</td>`;
+        let rowHtml = `<tr><td>${position}</td><td>${student["Exam Number"]}</td><td>${student["STUDENT'S NAME"]}</td><td>${student["Sex"] || '-'}</td>`;
 
         ALL_SUBJECTS.forEach(sub => {
             const rawScore = student[sub];
@@ -2849,6 +2889,9 @@ async function displayAnalysisSheet(form) {
         return;
     }
 
+    // Update title with school name and form
+    document.getElementById('analysisTitle').textContent = `NAMITETE SECONDARY SCHOOL - ${form.toUpperCase().replace('FORM', 'Form ')} Class Analysis Report`;
+
     const isLowerForm = form === 'form1' || form === 'form2';
     const gradeKey = isLowerForm ? currentConfig.gradeKeyLower : currentConfig.gradeKeyUpper;
     const gradeLabels = Object.keys(gradeKey);
@@ -2869,7 +2912,16 @@ async function displayAnalysisSheet(form) {
         };
     });
 
+    // Track boys and girls statistics
+    let boysStats = { entered: 0, pass: 0, fail: 0 };
+    let girlsStats = { entered: 0, pass: 0, fail: 0 };
+
     data.forEach(student => {
+        const studentSex = (student["Sex"] || '').toString().toUpperCase();
+        const studentMetrics = { entered: false, passed: false };
+        let subjectPassCount = 0;
+        let subjectCount = 0;
+
         ALL_SUBJECTS.forEach(sub => {
             const rawScore = student[sub];
             const numericScore = parseInt(rawScore);
@@ -2886,8 +2938,30 @@ async function displayAnalysisSheet(form) {
                     if (['1', '2', '3', '4', '5', '6', '7', '8'].includes(grade)) subjectMetrics[sub].pass++;
                     else if (grade === '9') subjectMetrics[sub].fail++;
                 }
+
+                subjectCount++;
+                if ((isLowerForm && ['A', 'B', 'C', 'D'].includes(grade)) || 
+                    (!isLowerForm && parseInt(grade) <= 8)) {
+                    subjectPassCount++;
+                }
             }
         });
+
+        // Count for boys/girls pass/fail statistics
+        if (subjectCount >= 4) {
+            studentMetrics.entered = true;
+            studentMetrics.passed = subjectPassCount >= 6;
+
+            if (studentSex === 'M' || studentSex === 'Y') {
+                boysStats.entered++;
+                if (studentMetrics.passed) boysStats.pass++;
+                else boysStats.fail++;
+            } else if (studentSex === 'F') {
+                girlsStats.entered++;
+                if (studentMetrics.passed) girlsStats.pass++;
+                else girlsStats.fail++;
+            }
+        }
     });
 
     let html = '<table id="analysisTable"><thead><tr><th>Subject</th>';
@@ -2914,6 +2988,58 @@ async function displayAnalysisSheet(form) {
     });
 
     html += '</tbody></table>';
+
+    // Add summary table for boys/girls statistics
+    const totalEntered = boysStats.entered + girlsStats.entered;
+    const totalPass = boysStats.pass + girlsStats.pass;
+    const totalFail = boysStats.fail + girlsStats.fail;
+    const boysPassPercent = boysStats.entered > 0 ? ((boysStats.pass / boysStats.entered) * 100).toFixed(1) : '0.0';
+    const girlsPassPercent = girlsStats.entered > 0 ? ((girlsStats.pass / girlsStats.entered) * 100).toFixed(1) : '0.0';
+    const totalPassPercent = totalEntered > 0 ? ((totalPass / totalEntered) * 100).toFixed(1) : '0.0';
+    const boysFailPercent = boysStats.entered > 0 ? ((boysStats.fail / boysStats.entered) * 100).toFixed(1) : '0.0';
+    const girlsFailPercent = girlsStats.entered > 0 ? ((girlsStats.fail / girlsStats.entered) * 100).toFixed(1) : '0.0';
+    const totalFailPercent = totalEntered > 0 ? ((totalFail / totalEntered) * 100).toFixed(1) : '0.0';
+
+    html += `
+    <table id="analysisSummaryTable" style="width:50%;border-collapse:collapse;margin-top:15px;border:1px solid black;">
+        <thead>
+            <tr style="background:#ecf0f1;">
+                <th style="border:1px solid black;padding:6px;width:15%;"></th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Entered</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Pass</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Pass%</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Fail</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Fail%</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="border:1px solid black;padding:6px;font-weight:bold;">BOYS(M)</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${boysStats.entered}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${boysStats.pass}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${boysPassPercent}%</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${boysStats.fail}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${boysFailPercent}%</td>
+            </tr>
+            <tr>
+                <td style="border:1px solid black;padding:6px;font-weight:bold;">GIRLS(F)</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${girlsStats.entered}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${girlsStats.pass}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${girlsPassPercent}%</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${girlsStats.fail}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${girlsFailPercent}%</td>
+            </tr>
+            <tr style="background:#f0f0f0;">
+                <td style="border:1px solid black;padding:6px;font-weight:bold;">TOTAL</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${totalEntered}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${totalPass}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${totalPassPercent}%</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${totalFail}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${totalFailPercent}%</td>
+            </tr>
+        </tbody>
+    </table>`;
+
     wrapper.innerHTML = html;
 }
 
@@ -2969,12 +3095,14 @@ async function showStudentMarksList() {
     students.forEach((s, i) => {
         const examNo = s["Exam Number"];
         const name = s["STUDENT'S NAME"];
+        const sex = s["Sex"] || '-';
         const val = s[subject] || '';
         
         const row = document.createElement('tr');
         row.innerHTML = `
             <td style="border:1px solid #cc6600;padding:8px;text-align:center;">${examNo}</td>
             <td style="border:1px solid #cc6600;padding:8px;">${name}</td>
+            <td style="border:1px solid #cc6600;padding:8px;text-align:center;width:40px;">${sex}</td>
             <td style="border:1px solid #cc6600;padding:8px;text-align:center;">
                 <input type="text" 
                        id="score_${i}" 
@@ -3079,6 +3207,8 @@ async function generateAllProgressReports() {
         document.getElementById('reportForm').textContent = form.toUpperCase();
         document.getElementById('reportExamNo').textContent = studentNumber;
         document.getElementById('reportTerm').textContent = currentConfig.term;
+        document.getElementById('reportYear').textContent = currentConfig.year || '2025';
+        document.getElementById('reportSex').textContent = student["Sex"] || '-';
 
         const reportBody = document.getElementById('reportBody');
         reportBody.innerHTML = '';
@@ -3256,6 +3386,7 @@ async function addStudentManually() {
     const form = document.getElementById('manualClassSelect').value;
     const name = document.getElementById('manualStudentName').value.trim();
     const examNo = document.getElementById('manualExamNumber').value.trim().toUpperCase();
+    const sex = document.getElementById('manualSex').value.trim().toUpperCase();
     const dob = document.getElementById('manualDOB').value.trim();
 
     if (!token) { alert('Authorization Code required.'); return; }
@@ -3272,7 +3403,7 @@ async function addStudentManually() {
         // Check for duplicate exam number
         if (classData.some(s => s["Exam Number"] === examNo)) {
             hideLoading();
-            alert('Student with this Exam Number already exists.');
+            alert('Student with this Exam Number already exists. Use "Overwrite Existing Student" button instead.');
             return;
         }
 
@@ -3281,6 +3412,7 @@ async function addStudentManually() {
         ALL_HEADERS.forEach(header => {
             if (header === "STUDENT'S NAME") newStudent[header] = name;
             else if (header === "Exam Number") newStudent[header] = examNo;
+            else if (header === "Sex") newStudent[header] = sex || '-';
             else if (header === "Date of Birth") newStudent[header] = dob;
             else newStudent[header] = '-'; // Set default score to dash
         });
@@ -3307,6 +3439,7 @@ async function addStudentManually() {
             // Clear inputs
             document.getElementById('manualStudentName').value = '';
             document.getElementById('manualExamNumber').value = '';
+            document.getElementById('manualSex').value = '';
             document.getElementById('manualDOB').value = '';
         }
     } catch (error) {
@@ -3434,7 +3567,8 @@ function updateGradeRange(type, gradeKey, newValue) {
 
 async function shareProgressReportOnWhatsApp() {
     const studentName = document.getElementById('reportStudentName').textContent || 'Student';
-    const fileName = `${studentName.replace(/[^a-zA-Z0-9]/g, '_')}_Progress_Report.pdf`;
+    const examNo = document.getElementById('reportExamNo').textContent || '';
+    const fileName = `${examNo}_${studentName.replace(/[^a-zA-Z0-9]/g, '_')}_Progress_Report.pdf`;
     const element = document.getElementById('progressReport');
     if (!element) {
         alert('Progress report not loaded.');
@@ -3483,6 +3617,162 @@ async function shareProgressReportOnWhatsApp() {
         console.error('Share error:', error);
         hideLoading();
         alert('Could not generate or share the PDF. Please try saving it first.');
+    }
+}
+
+// --- FUNCTION TO POPULATE CLEAR SUBJECT SELECT ---
+function populateClearSubjectSelect() {
+    const select = document.getElementById('clearSubjectSelect');
+    if (!select) return;
+    select.innerHTML = '<option value="">-- All Subjects --</option>';
+    ALL_SUBJECTS.forEach(sub => {
+        const opt = document.createElement('option');
+        opt.value = sub;
+        opt.textContent = sub;
+        select.appendChild(opt);
+    });
+}
+
+// --- FUNCTION TO EXPORT GRADE SHEET WITH SCHOOL NAME AND CLASS ---
+function exportGradeSheetWithFilename() {
+    const form = document.getElementById('gradesClassSelect').value;
+    if (!form) {
+        alert('Please select a Class first.');
+        return;
+    }
+    const formDisplay = form.toUpperCase().replace('FORM', 'Form ');
+    const filename = `Namitete_Secondary_${formDisplay}_GradeSheet`;
+    exportToExcel('gradesTable', filename);
+}
+
+// --- FUNCTION TO CLEAR SCORES FOR CLASS ---
+async function clearScoresForClass() {
+    const token = document.getElementById('githubToken').value;
+    const form = document.getElementById('clearScoresClassSelect').value;
+    const subject = document.getElementById('clearSubjectSelect').value;
+
+    if (!token) { alert('Authorization Code required.'); return; }
+    if (!form) { alert('Please select a Class.'); return; }
+
+    const confirmMsg = subject 
+        ? `Clear all ${subject} scores for ${form.toUpperCase()}?` 
+        : `Clear ALL subject scores for ${form.toUpperCase()}? (Student details will be preserved)`;
+    
+    if (!confirm(confirmMsg)) return;
+
+    showLoading();
+    updateLoadingPercent(10);
+
+    try {
+        const classData = await fetchClassData(form);
+        if (!classData || classData.length === 0) {
+            hideLoading();
+            alert('No student data found.');
+            return;
+        }
+
+        updateLoadingPercent(40);
+
+        // Clear scores but keep exam number, name, sex, date of birth
+        classData.forEach(student => {
+            if (subject) {
+                // Clear only the selected subject
+                student[subject] = '-';
+            } else {
+                // Clear all subjects
+                ALL_SUBJECTS.forEach(sub => {
+                    student[sub] = '-';
+                });
+            }
+        });
+
+        currentClassData[form] = classData;
+
+        // Save to GitHub
+        const fileName = `${form}.csv`;
+        const currentSha = await getCSVFileSha(form, token);
+        updateLoadingPercent(70);
+
+        const csvString = Papa.unparse(classData, { header: true, columns: ALL_HEADERS });
+        const base64Content = btoa(csvString);
+        const commitMessage = subject 
+            ? `Cleared ${subject} scores for ${form}` 
+            : `Cleared all scores for ${form}`;
+
+        const result = await commitFile(fileName, commitMessage, base64Content, currentSha, token, 'PUT');
+
+        hideLoading();
+        if (result) {
+            currentDataSha[form] = result.content.sha;
+            alert('Scores cleared successfully!');
+        }
+    } catch (error) {
+        hideLoading();
+        console.error('Clear scores failed:', error);
+        alert(`Failed to clear scores: ${error.message}`);
+    }
+}
+
+// --- FUNCTION TO OVERWRITE EXISTING STUDENT DATA ---
+async function overwriteStudentData() {
+    const token = document.getElementById('githubToken').value;
+    const form = document.getElementById('manualClassSelect').value;
+    const name = document.getElementById('manualStudentName').value.trim();
+    const examNo = document.getElementById('manualExamNumber').value.trim().toUpperCase();
+    const sex = document.getElementById('manualSex').value.trim().toUpperCase();
+    const dob = document.getElementById('manualDOB').value.trim();
+
+    if (!token) { alert('Authorization Code required.'); return; }
+    if (!form || !examNo) { alert('Form and Exam Number are required to find student.'); return; }
+
+    showLoading();
+    updateLoadingPercent(10);
+
+    try {
+        const classData = await fetchClassData(form);
+        updateLoadingPercent(40);
+
+        // Find the student by exam number
+        const studentIndex = classData.findIndex(s => s["Exam Number"] === examNo);
+
+        if (studentIndex === -1) {
+            hideLoading();
+            alert('Student with this Exam Number not found.');
+            return;
+        }
+
+        // Update student data
+        if (name) classData[studentIndex]["STUDENT'S NAME"] = name;
+        if (sex) classData[studentIndex]["Sex"] = sex;
+        if (dob) classData[studentIndex]["Date of Birth"] = dob;
+
+        currentClassData[form] = classData;
+
+        // Save to GitHub
+        const fileName = `${form}.csv`;
+        const currentSha = await getCSVFileSha(form, token);
+        updateLoadingPercent(70);
+
+        const csvString = Papa.unparse(classData, { header: true, columns: ALL_HEADERS });
+        const base64Content = btoa(csvString);
+        const commitMessage = `Updated student data for ${examNo} in ${form}`;
+
+        const result = await commitFile(fileName, commitMessage, base64Content, currentSha, token, 'PUT');
+
+        hideLoading();
+        if (result) {
+            currentDataSha[form] = result.content.sha;
+            alert(`Student ${examNo} updated successfully!`);
+            // Clear inputs
+            document.getElementById('manualStudentName').value = '';
+            document.getElementById('manualExamNumber').value = '';
+            document.getElementById('manualSex').value = '';
+            document.getElementById('manualDOB').value = '';
+        }
+    } catch (error) {
+        hideLoading();
+        console.error('Overwrite failed:', error);
+        alert(`Failed to update student: ${error.message}`);
     }
 }
 </script>
