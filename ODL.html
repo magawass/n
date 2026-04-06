@@ -619,6 +619,44 @@ function saveSelectedSubjectsToRepo() {
         }
     }
 
+    /* Mobile Print Support - Phone-friendly printing */
+    @media print and (max-width: 768px) {
+        html, body {
+            width: 100% !important;
+            overflow: visible !important;
+        }
+        
+        #progressReport[style*="block"],
+        #briefReport[style*="block"] {
+            position: relative !important;
+            left: 0 !important;
+            right: 0 !important;
+            top: 0 !important;
+            bottom: auto !important;
+            width: 100% !important;
+            padding: 10px !important;
+            font-size: 9pt !important;
+        }
+        
+        #resultsTable th, #resultsTable td,
+        #briefResultsTable th, #briefResultsTable td {
+            padding: 2px 1px !important;
+            font-size: 7pt !important;
+        }
+        
+        .logo {
+            max-width: 80px !important;
+        }
+        
+        h1 p {
+            font-size: 16px !important;
+        }
+        
+        #reportDetails p, #briefReportDetails p {
+            font-size: 8pt !important;
+        }
+    }
+
     @media (min-width: 795px) {
         #progressReport, #briefReport {
             padding: 40px 40px 40px 40px;
@@ -770,12 +808,17 @@ function saveSelectedSubjectsToRepo() {
     <button class="back-btn" onclick="handleProgressBack()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
     <header id="reportHeader" style="width: 100%;">
-        <img src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
-        <div id="reportHeaderRight">
-            <h3>NAMITETE SECONDARY SCHOOL</h3>
-            Private Bag 3,<br>
-            Namitete,<br>
-            Lilongwe.
+        <img 
+src="https://raw.githubusercontent.com/magawass/n/main/logo.png" class="logo" alt="School Logo">
+        <div id="reportHeaderCenter">
+            <div style="font-family: 'Times New Roman', Times, serif;">
+ <div style="text-align: center;">
+<h1><p style="font-size:25px;">NAMITETE SECONDARY SCHOOL</p></h1>
+ <div style="text-align: center;">
+
+               <p style="margin:5px 0; font-size: 14pt;"><strong>Private  Bag  3,<br>Namitete, Lilongwe.</strong><br>
+
+
         </div>
     </header>
 
@@ -819,9 +862,9 @@ function saveSelectedSubjectsToRepo() {
     </div>
 
     <div id="reportCommentsSection" style="margin-top:10px; text-align:left; width:100%;">
-        <p style="margin:5px 0;"><strong>FORM TEACHER'S COMMENT:</strong> <span id="reportTeacherComment" style="font-style:italic; font-weight:bold;"></span></p>
-        <p style="margin:5px 0;"><strong>HEADTEACHER'S COMMENT:</strong> <span id="reportHeadComment" style="font-style:italic; font-weight:bold;"></span></p>
-        <p style="margin:5px 0;"><strong>NEXT TERM OPENS:</strong> <span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;<strong>FEES:</strong> <span id="reportFees"></span></p>
+        <p style="margin:5px 0;">FORM TEACHER'S COMMENT: <span id="reportTeacherComment" style="font-style:italic; font-weight:bold;"></span></p>
+        <p style="margin:5px 0;">HEADTEACHER'S COMMENT: <span id="reportHeadComment" style="font-style:italic; font-weight:bold;"></span></p>
+        <p style="margin:5px 0;">NEXT TERM OPENS: <span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;FEES: <span id="reportFees"></span></p>
     </div>
 
     <div id="reportGradeKeySection" style="margin-top:10px; width:100%; text-align:left;">
@@ -2912,15 +2955,14 @@ async function displayAnalysisSheet(form) {
         };
     });
 
-    // Track boys and girls statistics
+    // Track boys and girls statistics - pulled from Grade Sheet Remark column and Sex column
     let boysStats = { entered: 0, pass: 0, fail: 0 };
     let girlsStats = { entered: 0, pass: 0, fail: 0 };
 
     data.forEach(student => {
         const studentSex = (student["Sex"] || '').toString().toUpperCase();
-        const studentMetrics = { entered: false, passed: false };
-        let subjectPassCount = 0;
         let subjectCount = 0;
+        let nonNumericSubjectsCount = 0;
 
         ALL_SUBJECTS.forEach(sub => {
             const rawScore = student[sub];
@@ -2940,25 +2982,24 @@ async function displayAnalysisSheet(form) {
                 }
 
                 subjectCount++;
-                if ((isLowerForm && ['A', 'B', 'C', 'D'].includes(grade)) || 
-                    (!isLowerForm && parseInt(grade) <= 8)) {
-                    subjectPassCount++;
-                }
+            } else if (rawScore !== undefined && rawScore !== null && rawScore.toString().trim() !== '') {
+                nonNumericSubjectsCount++;
             }
         });
 
-        // Count for boys/girls pass/fail statistics
-        if (subjectCount >= 4) {
-            studentMetrics.entered = true;
-            studentMetrics.passed = subjectPassCount >= 6;
+        // Use same rankability check as Grade Sheet (calculateStudentMetrics): subjectsCount >= 4 AND nonNumericSubjectsCount <= 5
+        // Then use isStudentPass (same function Grade Sheet Remark column uses) to determine Pass/Fail
+        const isRankable = (subjectCount >= 4 && nonNumericSubjectsCount <= 5);
+        if (isRankable) {
+            const hasPassed = isStudentPass(form, student);
 
             if (studentSex === 'M' || studentSex === 'Y') {
                 boysStats.entered++;
-                if (studentMetrics.passed) boysStats.pass++;
+                if (hasPassed) boysStats.pass++;
                 else boysStats.fail++;
             } else if (studentSex === 'F') {
                 girlsStats.entered++;
-                if (studentMetrics.passed) girlsStats.pass++;
+                if (hasPassed) girlsStats.pass++;
                 else girlsStats.fail++;
             }
         }
@@ -3005,11 +3046,11 @@ async function displayAnalysisSheet(form) {
         <thead>
             <tr style="background:#ecf0f1;">
                 <th style="border:1px solid black;padding:6px;width:15%;"></th>
-                <th style="border:1px solid black;padding:6px;text-align:center;">Entered</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Entry</th>
                 <th style="border:1px solid black;padding:6px;text-align:center;">Pass</th>
-                <th style="border:1px solid black;padding:6px;text-align:center;">Pass%</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Pass Percentage</th>
                 <th style="border:1px solid black;padding:6px;text-align:center;">Fail</th>
-                <th style="border:1px solid black;padding:6px;text-align:center;">Fail%</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Fail Percentage</th>
             </tr>
         </thead>
         <tbody>
@@ -3571,7 +3612,7 @@ async function shareProgressReportOnWhatsApp() {
     const fileName = `${examNo}_${studentName.replace(/[^a-zA-Z0-9]/g, '_')}_Progress_Report.pdf`;
     const element = document.getElementById('progressReport');
     if (!element) {
-        alert('Progress report not loaded.');
+        console.log('Progress report not loaded.');
         return;
     }
     showLoading();
@@ -3594,29 +3635,42 @@ async function shareProgressReportOnWhatsApp() {
         updateLoadingPercent(80);
         hideLoading();
         const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+        
+        // Try Web Share API first (works on mobile with WhatsApp)
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-            await navigator.share({
-                files: [pdfFile],
-                title: `Progress Report - ${studentName}`,
-                text: `Here is the progress report for ${studentName} from Namitete Secondary School.`
-            });
-            console.log('Shared via WhatsApp or system share');
-        } else {
-            // Fallback download
-            const url = URL.createObjectURL(pdfBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            alert('PDF downloaded successfully! Open WhatsApp and share the file from your Downloads folder.');
+            try {
+                await navigator.share({
+                    files: [pdfFile],
+                    title: `Progress Report - ${studentName}`,
+                    text: `Here is the progress report for ${studentName} from Namitete Secondary School.`
+                });
+                console.log('Shared successfully');
+                return;
+            } catch (shareError) {
+                // User cancelled or share failed - silently handle
+                console.log('Share cancelled or failed');
+            }
         }
+        
+        // Fallback: Open WhatsApp Web with pre-filled message and download PDF
+        const message = encodeURIComponent(`Here is the progress report for ${studentName} from Namitete Secondary School.`);
+        const whatsappUrl = `https://wa.me/?text=${message}`;
+        
+        // Download the PDF first
+        const url = URL.createObjectURL(pdfBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        // Open WhatsApp Web in new tab
+        window.open(whatsappUrl, '_blank');
     } catch (error) {
         console.error('Share error:', error);
         hideLoading();
-        alert('Could not generate or share the PDF. Please try saving it first.');
     }
 }
 
