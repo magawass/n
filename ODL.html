@@ -162,7 +162,6 @@ function saveSelectedSubjectsToRepo() {
         min-height: 100vh;
         padding: 20px;
         overflow-y: auto;
-        overflow-x: auto;
     }
 
     /* --- Loading Indicator Styles --- */
@@ -224,13 +223,13 @@ function saveSelectedSubjectsToRepo() {
         margin: 20px auto;
         text-align: center;
         height: auto;
-        overflow-x: auto;
+        overflow-x: hidden; /* Prevent container level scroll */
     }
 
     #initialPage { display: block; text-align: center; }
 
     /* Header/Logo */
-    .logo { max-width: 200px; height: auto; margin-bottom: 10px; }
+    .logo { max-width: 150px; height: auto; margin-bottom: 10px; }
     h1, h2 { color: #34495e; margin: 5px 0; font-weight: 600; }
     h1 p { font-size: 24px; margin: 0; }
     h2 { font-size: 1.2em; color: #7f8c8d; }
@@ -341,7 +340,6 @@ function saveSelectedSubjectsToRepo() {
         border: 1px solid black;
         padding: 10px 8px;
         white-space: nowrap; /* Prevent messy wrapping in wide tables */
-        font-weight: normal;
     }
 
     #resultsTable th, #gradesTable th, #analysisTable th, #scoresTable th, #briefResultsTable th {
@@ -351,9 +349,6 @@ function saveSelectedSubjectsToRepo() {
         text-align: center;
     }
 
-    /* Only table headers are bold, all data cells are normal weight */
-    #analysisTable td:first-child { font-weight: normal; }
-
     #resultsTable td:first-child, #gradesTable td:first-child, #scoresTable td:nth-child(2), #briefResultsTable td:first-child { text-align: left; }
     #resultsTable td:not(:first-child), #gradesTable td:not(:first-child), #scoresTable td:not(:nth-child(2)), #briefResultsTable td:not(:first-child) { text-align: center; }
     #analysisTable td { text-align: center; }
@@ -361,21 +356,17 @@ function saveSelectedSubjectsToRepo() {
     /* Progress Report Layout */
     #progressReport #reportHeader {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 5px;
-        width: 100%;
-    }
-
-    #progressReport #reportHeader .logo {
-        max-width: 180px;
-        height: auto;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: flex-start;
         margin-bottom: 5px;
     }
 
     #reportHeaderRight {
         text-align: center;
-        font-size: 0.9em;
+        flex: 1;
+        margin-left: -15px;
+        font-size: 0.8em;
         line-height: 1.4;
     }
 
@@ -423,7 +414,7 @@ function saveSelectedSubjectsToRepo() {
         border-collapse: collapse;
         font-size: 8pt;
         border: 1px solid black;
-        margin: 0;
+        margin: 0 auto;
     }
 
     #reportGradeKeyTable th, #reportGradeKeyTable td {
@@ -459,35 +450,7 @@ function saveSelectedSubjectsToRepo() {
         body { padding: 10px; }
         .page { padding: 15px; width: 98%; }
         #progressReport, #briefReport { padding: 20px 10px; width: 98%; }
-
-        /* Sheet pages: allow full width with scrollable tables on mobile */
-        #scoreSheetView,
-        #gradesPage,
-        #analysisPage {
-            width: 100% !important;
-            max-width: 100% !important;
-            padding: 10px !important;
-        }
-        #scoreSheetView .table-wrapper,
-        #gradesPage .table-wrapper,
-        #analysisPage .table-wrapper {
-            overflow-x: auto !important;
-            margin-left: -10px;
-            margin-right: -10px;
-            padding-left: 10px;
-            padding-right: 10px;
-            width: calc(100% + 20px) !important;
-        }
-        #gradesTable, #analysisTable, #scoresTable {
-            width: max-content !important;
-            font-size: 0.75em !important;
-        }
-        #gradesTable th, #gradesTable td,
-        #analysisTable th, #analysisTable td,
-        #scoresTable th, #scoresTable td {
-            padding: 5px 4px !important;
-        }
-
+        
         .info-row { flex-direction: column; }
         .info-row p { width: 100%; text-align: left !important; }
         .actions { flex-direction: column; gap: 15px; }
@@ -501,35 +464,14 @@ function saveSelectedSubjectsToRepo() {
 
         /* Surgical Fix: Sheets Overview & Initial Page Mobile Layout Alignment */
         #sheetsPage h2, #initialPage h2 { margin-top: 40px; }
-        #sheetsPage div[style*="display: flex"], #initialPage div[style*="display: flex"] {
-            flex-direction: column !important;
-            align-items: center !important;
+        #sheetsPage div[style*="display: flex"], #initialPage div[style*="display: flex"] { 
+            flex-direction: column !important; 
+            align-items: center !important; 
         }
-        #sheetsPage div[style*="display: flex"] button, #initialPage div[style*="display: flex"] button {
-            width: 100% !important;
-            max-width: 400px !important;
-            margin: 10px auto 0 auto !important;
-        }
-    }
-
-    /* Tablet breakpoint - sheets need wider container */
-    @media (min-width: 481px) and (max-width: 767px) {
-        #scoreSheetView,
-        #gradesPage,
-        #analysisPage {
-            width: 98% !important;
-            max-width: 98vw !important;
-            overflow-x: auto !important;
-        }
-        #scoreSheetView .table-wrapper,
-        #gradesPage .table-wrapper,
-        #analysisPage .table-wrapper {
-            overflow-x: auto !important;
-            width: 100% !important;
-        }
-        #gradesTable, #analysisTable, #scoresTable {
-            width: max-content !important;
-            table-layout: auto !important;
+        #sheetsPage div[style*="display: flex"] button, #initialPage div[style*="display: flex"] button { 
+            width: 100% !important; 
+            max-width: 400px !important; 
+            margin: 10px auto 0 auto !important; 
         }
     }
 
@@ -538,23 +480,21 @@ function saveSelectedSubjectsToRepo() {
         #scoreSheetView,
         #gradesPage,
         #analysisPage {
-            max-width: 98vw !important;
-            width: 98vw !important;
-            overflow-x: auto !important;
+            max-width: 1200px !important;
+            width: 90% !important;
         }
 
         #scoreSheetView .table-wrapper,
         #gradesPage .table-wrapper,
         #analysisPage .table-wrapper {
-            overflow-x: auto !important;
-            max-width: 100% !important;
+            overflow-x: visible !important;
         }
 
         #gradesTable,
         #analysisTable,
         #scoresTable {
             min-width: 100% !important;
-            width: max-content !important;
+            width: 100% !important;
             table-layout: auto !important;
         }
     }
@@ -782,9 +722,9 @@ function saveSelectedSubjectsToRepo() {
         <img src="https://raw.githubusercontent.com/magawass/m/main/logo.png" class="logo" alt="School Logo">
         <div id="briefReportHeaderRight">
             <h3>NAMITETE SECONDARY SCHOOL</h3>
-            Private Bag 3, Namitete<br>
-            
-            
+            P.O. Box 138,<br>
+            Namitete,<br>
+            Lilongwe.
         </div>
     </header>
 
@@ -792,9 +732,9 @@ function saveSelectedSubjectsToRepo() {
     <h2 style="margin: 0; color: black; font-size: 1.2em;"><strong>BRIEF RESULTS</strong></h2>
 
     <div id="briefReportDetails" style="margin-top: 15px; text-align: left;">
-        <p><strong>NAME:</strong> <span id="briefReportStudentName"></span></p>
+        <p><strong>STUDENT NAME:</strong> <span id="briefReportStudentName"></span></p>
         <p><strong>CLASS:</strong> <span id="briefReportForm"></span></p>
-        <p><strong>REG NO:</strong> <span id="briefReportExamNo"></span></p>
+        <p><strong>EXAM NO:</strong> <span id="briefReportExamNo"></span></p>
         <p><strong>TERM:</strong> <span id="briefReportTerm"></span></p>
     </div>
 
@@ -831,25 +771,24 @@ function saveSelectedSubjectsToRepo() {
     <header id="reportHeader" style="width: 100%;">
         <img src="https://raw.githubusercontent.com/magawass/m/main/logo.png" class="logo" alt="School Logo">
         <div id="reportHeaderRight">
-            <div style="font-family: 'Times New Roman', Times, serif;">
-    <p style="margin:5px 0;"><h3>NAMITETE SECONDARY SCHOOL</h3>
-           <p style="margin:5px 0; font-size: 12pt;"><strong>Private Bag 3, Namitete.</strong><br>
-            
-           
+            <h3>NAMITETE SECONDARY SCHOOL</h3>
+            P.O. Box 138,<br>
+            Namitete,<br>
+            Lilongwe.
         </div>
     </header>
 
     <hr style="border-top: 2px solid black; margin: 10px 0;">
     <div style="text-align: center;">
-      <p style="font-size: 10px;"> <h2 style="margin: 0;color: black;"><strong>STUDENT PROGRESS REPORT</strong></h2>
+      <p style="font-size: 10px;"> <h2 style="margin: 0;color: black;"><strong>PROGRESS REPORT</strong></h2>
     </div>
 
     <div id="reportDetails">
     <div class="info-row">
     <span><strong>NAME:</strong> <span id="reportStudentName"></span>&nbsp;&nbsp;
-    <span><strong>REG No:</strong> <span id="reportExamNo"></span>&nbsp;&nbsp;
+    <span><strong>Exam No:</strong> <span id="reportExamNo"></span>&nbsp;&nbsp;
     <span><strong>SEX:</strong> <span id="reportSex"></span>&nbsp;&nbsp;
-    <span><strong>CLASS:</strong> <span id="reportForm"></span> &nbsp;&nbsp;
+    <span><strong>FORM:</strong> <span id="reportForm"></span> &nbsp;&nbsp;
     <span><strong>TERM:</strong> <span id="reportTerm"></span>&nbsp;&nbsp;
     <span><strong>YEAR:</strong> <span id="reportYear"></span>
 </div>
@@ -862,7 +801,7 @@ function saveSelectedSubjectsToRepo() {
                     <th style="width: 10%;">SCORE</th>
                     <th style="width: 10%;">GRADE</th>
                     <th style="width: 10%;">POSITION</th>
-                    <th style="width: 30%;">COMMENT</th>
+                    <th style="width: 30%;">REMARKS</th>
                     <th style="width: 20%;">TEACHER</th>
                 </tr>
             </thead>
@@ -873,16 +812,15 @@ function saveSelectedSubjectsToRepo() {
 
     <div id="summaryAndKeyWrapper">
         <div id="reportSummary" style="width:100%;">
-            
-            <div><p style="margin:5px 0; font-size: 11pt;">POSITION: <strong><span id="reportPosition"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OUT OF: <strong><span id="reportTotalStudents"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STATUS: <strong><span id="reportStatus"></span></strong></div>
- 
+            <br>
+            <div>POSITION in class: <strong><span id="reportPosition"></span></strong>&nbsp;&nbsp;OUT OF: <strong><span id="reportTotalStudents"></span></strong>&nbsp;&nbsp;STATUS: <strong><span id="reportStatus"></span></strong></div>
         </div>
     </div>
 
-    <div id="reportCommentsSection" style="margin-top:8px; text-align:left; width:100%;">
-        <p style="margin:5px 0;"></strong>FORM TEACHER'S COMMENT:<strong><span id="reportTeacherComment" style="font-style:italic;"></span></p>
-        <p style="margin:5px 0;"></strong>HEADTEACHER'S COMMENT:<strong><span id="reportHeadComment" style="font-style:italic;"></span></p>
-        <p style="margin:5px 0;"></strong>Next term opens:<strong><span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>Fees for next term:<strong><span id="reportFees"></span></p></span><strong>KEY:</strong><span>
+    <div id="reportCommentsSection" style="margin-top:10px; text-align:left; width:100%;">
+        <p style="margin:5px 0;"><strong>FORM TEACHER'S COMMENT:</strong> <span id="reportTeacherComment" style="font-style:italic; font-weight:bold;"></span></p>
+        <p style="margin:5px 0;"><strong>HEADTEACHER'S COMMENT:</strong> <span id="reportHeadComment" style="font-style:italic; font-weight:bold;"></span></p>
+        <p style="margin:5px 0;"><strong>NEXT TERM OPENS:</strong> <span id="reportNextTerm"></span>&nbsp;&nbsp;&nbsp;<strong>FEES:</strong> <span id="reportFees"></span></p>
     </div>
 
     <div id="reportGradeKeySection" style="margin-top:10px; width:100%;">
@@ -1012,8 +950,6 @@ function saveSelectedSubjectsToRepo() {
         <option value="2">Term 2</option>
         <option value="3">Term 3</option>
     </select>
-    <label for="reportYearInput">Academic Year:</label>
-    <input type="text" id="reportYearInput" placeholder="e.g. 2026">
     <label for="generalCommentInput">General Report Comment:</label>
     <textarea id="generalCommentInput" rows="3" placeholder="Enter comment for all reports..."></textarea>
 
@@ -1095,7 +1031,6 @@ function saveSelectedSubjectsToRepo() {
                     <tr style="background: #ecf0f1;">
                         <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">Grade</th>
                         <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">Min. Score</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">COMMENT</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -1110,7 +1045,6 @@ function saveSelectedSubjectsToRepo() {
                     <tr style="background: #ecf0f1;">
                         <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">Grade</th>
                         <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">Min. Score</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">COMMENT</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -1238,8 +1172,8 @@ const API_BASE = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/con
 // Grade boundary definitions
 const GRADE_KEY_LOWER = {
     A: 80,
-    B: 60,
-    C: 50,
+    B: 65,
+    C: 55,
     D: 40,
     F: 0
 }; // Lower forms use A-F
@@ -1355,13 +1289,10 @@ function computeSubjectPositions(form, subject, classData) {
 }
 
 function lowerFormRemarkFromGrade(g){
-    if(currentConfig && currentConfig.gradeCommentsLower && currentConfig.gradeCommentsLower[g]) {
-        return currentConfig.gradeCommentsLower[g];
-    }
-    if(g==='A') return 'Excellent pass';
-    if(g==='B') return 'Very good pass';
-    if(g==='C') return 'Good pass';
-    if(g==='D') return 'Bare pass';
+    if(g==='A') return 'Excellent';
+    if(g==='B') return 'Very Good';
+    if(g==='C') return 'Good';
+    if(g==='D') return 'Average';
     if(g==='F') return 'Fail';
     return '-';
 }
@@ -1428,14 +1359,11 @@ function getDefaultConfig() {
     return {
         locks: {},
         term: '3',
-        year: '',
         generalComment: 'Excellent effort. Keep up the hard work.',
         nextTermOpens: '',
         fees: '',
         gradeKeyLower: GRADE_KEY_LOWER,
         gradeKeyUpper: GRADE_KEY_UPPER,
-        gradeCommentsLower: { A: 'Excellent pass', B: 'Very good pass', C: 'Good pass', D: 'Bare pass', F: 'Fail' },
-        gradeCommentsUpper: { 1: 'Distinction', 2: 'Distinction', 3: 'Strong Credit', 4: 'Strong Credit', 5: 'Weak Credit', 6: 'Weak Credit', 7: 'Bare Pass', 8: 'Bare Pass', 9: 'Fail' },
         teachers: teachers,
         passwordEnabled: true
     };
@@ -1530,31 +1458,26 @@ function getGradeAndRemark(form, score) {
             } else {
                 grade = '9';
             }
-            // Use custom comments from config if available
-            if (currentConfig && currentConfig.gradeCommentsUpper && currentConfig.gradeCommentsUpper[grade]) {
-                remark = currentConfig.gradeCommentsUpper[grade];
+            if (parseInt(grade) <= 1 ) {
+                remark = 'Distinction';
+            } else if (parseInt(grade) <=2) {
+                 remark = 'Distinction';
+            } else if (parseInt(grade) <=3) {
+                 remark = 'Strong Credit';
+            } else if (parseInt(grade) <=4) {
+                 remark = 'Strong Credit';
+            } else if (parseInt(grade) <=5) {
+                 remark = 'Credit';
+            } else if (parseInt(grade) <=6) {
+                 remark = 'Credit';
+            } else if (parseInt(grade) <=7) {
+                 remark = 'Pass';
+            } else if (parseInt(grade) <=8) {
+                 remark = 'Pass';
+            } else if (parseInt(grade) <=9) {
+                 remark = 'Fail';
             } else {
-                if (parseInt(grade) <= 1 ) {
-                    remark = 'Distinction';
-                } else if (parseInt(grade) <=2) {
-                     remark = 'Distinction';
-                } else if (parseInt(grade) <=3) {
-                     remark = 'Strong Credit';
-                } else if (parseInt(grade) <=4) {
-                     remark = 'Strong Credit';
-                } else if (parseInt(grade) <=5) {
-                     remark = 'Weak Credit';
-                } else if (parseInt(grade) <=6) {
-                     remark = 'Weak Credit';
-                } else if (parseInt(grade) <=7) {
-                     remark = 'Bare Pass';
-                } else if (parseInt(grade) <=8) {
-                     remark = 'Bare Pass';
-                } else if (parseInt(grade) <=9) {
-                     remark = 'Fail';
-                } else {
-                    remark = 'Fail';
-                }
+                remark = 'Fail';
             }
         }
         return { grade: grade.toString(), remark: remark };
@@ -1887,9 +1810,6 @@ async function initializeConfig(token) {
     if(document.getElementById('reportTermSelect')) {
          document.getElementById('reportTermSelect').value = currentConfig.term;
     }
-    if(document.getElementById('reportYearInput')) {
-        document.getElementById('reportYearInput').value = currentConfig.year || '';
-    }
     if(document.getElementById('generalCommentInput')) {
         document.getElementById('generalCommentInput').value = currentConfig.generalComment;
     }
@@ -1916,14 +1836,11 @@ async function handleSaveConfig() {
 
     const newConfig = {
         term: document.getElementById('reportTermSelect').value,
-        year: document.getElementById('reportYearInput').value,
         generalComment: document.getElementById('generalCommentInput').value,
         nextTermOpens: document.getElementById('nextTermOpensInput').value,
         fees: document.getElementById('feesInput').value,
         gradeKeyLower: currentConfig.gradeKeyLower,
         gradeKeyUpper: currentConfig.gradeKeyUpper,
-        gradeCommentsLower: currentConfig.gradeCommentsLower || {},
-        gradeCommentsUpper: currentConfig.gradeCommentsUpper || {},
         teachers: {},
         passwordEnabled: currentConfig.passwordEnabled
     };
@@ -2015,7 +1932,7 @@ async function uploadCSV() {
             token,
             'PUT'
         );
-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
+
         hideLoading();
         if (result) {
             alert(`File ${fileName} uploaded/updated successfully!`);
@@ -2389,7 +2306,6 @@ async function loadResults(isStudentPortal) {
         document.getElementById('reportForm').textContent = form.toUpperCase();
         document.getElementById('reportExamNo').textContent = studentNumber;
         document.getElementById('reportTerm').textContent = currentConfig.term;
-        document.getElementById('reportYear').textContent = currentConfig.year || '';
 
         const reportBody = document.getElementById('reportBody');
         reportBody.innerHTML = '';
@@ -2427,19 +2343,14 @@ async function loadResults(isStudentPortal) {
             row.insertCell().textContent = teacher;
         });
 
-        // --- Add TOTAL SCORES / AGGREGATE summary row at the bottom of the table ---
-        const isUpperForm = form === 'form3' || form === 'form4';
-        const summaryRow = reportBody.insertRow();
-        const labelCell = summaryRow.insertCell();
-        labelCell.textContent = isUpperForm ? 'AGGREGATE' : 'TOTAL SCORES';
-        labelCell.style.fontWeight = 'bold';
-        const scoreCell = summaryRow.insertCell();
-        scoreCell.textContent = isUpperForm ? '' : (studentMetrics.totalScore > 0 ? studentMetrics.totalScore : '0');
-        scoreCell.style.fontWeight = 'bold';
-        const gradeCell = summaryRow.insertCell();
-        gradeCell.textContent = isUpperForm ? (studentMetrics.aggregate !== '-' ? studentMetrics.aggregate : '-') : '';
-        gradeCell.style.fontWeight = 'bold';
-        // Leave remaining columns (POSITION, COMMENT, TEACHER) empty - row ends at GRADE column
+        // AVERAGE row at bottom of table
+        const averageRow = reportBody.insertRow();
+        const avgCell = averageRow.insertCell();
+        avgCell.textContent = 'AVERAGE';
+        avgCell.style.fontWeight = 'bold';
+        const avgScoreCell = averageRow.insertCell();
+        avgScoreCell.textContent = studentMetrics.average > 0 ? studentMetrics.average.toFixed(1) : '-';
+        avgScoreCell.colSpan = 5;
 
         let overallRank = 'N/A';
         let positionNum = null;
@@ -3062,14 +2973,14 @@ async function showStudentMarksList() {
         
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td style="border:1px solid #cc6600;padding:8px;text-align:center;font-weight:normal;">${examNo}</td>
-            <td style="border:1px solid #cc6600;padding:8px;font-weight:normal;">${name}</td>
+            <td style="border:1px solid #cc6600;padding:8px;text-align:center;">${examNo}</td>
+            <td style="border:1px solid #cc6600;padding:8px;">${name}</td>
             <td style="border:1px solid #cc6600;padding:8px;text-align:center;">
                 <input type="text" 
                        id="score_${i}" 
                        value="${val}" 
                        oninput="updateStudentScore('${form}', ${i}, '${subject}', this.value)"
-                       style="width:80px;padding:6px;text-align:center;border:1px solid #cc6600;border-radius:4px;font-weight:normal;"
+                       style="width:80px;padding:6px;text-align:center;border:1px solid #cc6600;border-radius:4px;"
                        placeholder=" ">
             </td>
         `;
@@ -3168,7 +3079,6 @@ async function generateAllProgressReports() {
         document.getElementById('reportForm').textContent = form.toUpperCase();
         document.getElementById('reportExamNo').textContent = studentNumber;
         document.getElementById('reportTerm').textContent = currentConfig.term;
-        document.getElementById('reportYear').textContent = currentConfig.year || '';
 
         const reportBody = document.getElementById('reportBody');
         reportBody.innerHTML = '';
@@ -3189,18 +3099,14 @@ async function generateAllProgressReports() {
             row.insertCell().textContent = teacher;
         });
 
-        // --- Add TOTAL SCORES / AGGREGATE summary row ---
-        const batchIsUpperForm = form === 'form3' || form === 'form4';
-        const batchSummaryRow = reportBody.insertRow();
-        const batchLabelCell = batchSummaryRow.insertCell();
-        batchLabelCell.textContent = batchIsUpperForm ? 'AGGREGATE' : 'TOTAL SCORES';
-        batchLabelCell.style.fontWeight = 'bold';
-        const batchScoreCell = batchSummaryRow.insertCell();
-        batchScoreCell.textContent = batchIsUpperForm ? '' : (metrics.totalScore > 0 ? metrics.totalScore : '0');
-        batchScoreCell.style.fontWeight = 'bold';
-        const batchGradeCell = batchSummaryRow.insertCell();
-        batchGradeCell.textContent = batchIsUpperForm ? (metrics.aggregate !== '-' ? metrics.aggregate : '-') : '';
-        batchGradeCell.style.fontWeight = 'bold';
+        // AVERAGE row at bottom of table
+        const averageRow = reportBody.insertRow();
+        const avgCell = averageRow.insertCell();
+        avgCell.textContent = 'AVERAGE';
+        avgCell.style.fontWeight = 'bold';
+        const avgScoreCell = averageRow.insertCell();
+        avgScoreCell.textContent = metrics.average > 0 ? metrics.average.toFixed(1) : '-';
+        avgScoreCell.colSpan = 5;
 
         // 2. Set Summary Details
         let overallRank = 'N/A';
@@ -3468,13 +3374,6 @@ function populateGradeEditors() {
         console.warn('Config not loaded for grade editors');
         return;
     }
-    // Ensure comment objects exist
-    if (!currentConfig.gradeCommentsLower) {
-        currentConfig.gradeCommentsLower = { A: 'Excellent pass', B: 'Very good pass', C: 'Good pass', D: 'Bare pass', F: 'Fail' };
-    }
-    if (!currentConfig.gradeCommentsUpper) {
-        currentConfig.gradeCommentsUpper = { 1: 'Distinction', 2: 'Distinction', 3: 'Strong Credit', 4: 'Strong Credit', 5: 'Weak Credit', 6: 'Weak Credit', 7: 'Bare Pass', 8: 'Bare Pass', 9: 'Fail' };
-    }
     // Lower Forms 1 & 2
     let lowerTable = document.getElementById('lowerGradeEditor');
     if (lowerTable) {
@@ -3483,17 +3382,12 @@ function populateGradeEditors() {
         const lowerKeys = Object.keys(currentConfig.gradeKeyLower).sort((a, b) => currentConfig.gradeKeyLower[b] - currentConfig.gradeKeyLower[a]);
         lowerKeys.forEach(grade => {
             const minScore = currentConfig.gradeKeyLower[grade];
-            const comment = currentConfig.gradeCommentsLower[grade] || '';
             const rowHTML = `
                 <tr>
                     <td style="border:1px solid #ccc; padding:8px; text-align:center; font-weight:bold;">${grade}</td>
                     <td style="border:1px solid #ccc; padding:8px;">
-                        <input type="number" value="${minScore}" style="width:100%; padding:5px; text-align:center; border:1px solid #98FB98;"
+                        <input type="number" value="${minScore}" style="width:100%; padding:5px; text-align:center; border:1px solid #98FB98;" 
                         onchange="updateGradeRange('lower', '${grade}', this.value)">
-                    </td>
-                    <td style="border:1px solid #ccc; padding:8px;">
-                        <input type="text" value="${comment}" style="width:100%; padding:5px; text-align:left; border:1px solid #98FB98; font-weight:normal;"
-                        onchange="updateGradeComment('lower', '${grade}', this.value)">
                     </td>
                 </tr>
             `;
@@ -3508,17 +3402,12 @@ function populateGradeEditors() {
         const upperKeys = Object.keys(currentConfig.gradeKeyUpper).sort((a, b) => parseInt(a) - parseInt(b));
         upperKeys.forEach(grade => {
             const minScore = currentConfig.gradeKeyUpper[grade];
-            const comment = currentConfig.gradeCommentsUpper[grade] || '';
             const rowHTML = `
                 <tr>
                     <td style="border:1px solid #ccc; padding:8px; text-align:center; font-weight:bold;">${grade}</td>
                     <td style="border:1px solid #ccc; padding:8px;">
-                        <input type="number" value="${minScore}" style="width:100%; padding:5px; text-align:center; border:1px solid #98FB98;"
+                        <input type="number" value="${minScore}" style="width:100%; padding:5px; text-align:center; border:1px solid #98FB98;" 
                         onchange="updateGradeRange('upper', '${grade}', this.value)">
-                    </td>
-                    <td style="border:1px solid #ccc; padding:8px;">
-                        <input type="text" value="${comment}" style="width:100%; padding:5px; text-align:left; border:1px solid #98FB98; font-weight:normal;"
-                        onchange="updateGradeComment('upper', '${grade}', this.value)">
                     </td>
                 </tr>
             `;
@@ -3541,20 +3430,6 @@ function updateGradeRange(type, gradeKey, newValue) {
     }
     console.log(`Grade range updated: ${type} ${gradeKey} = ${val}`);
     // Changes reflect immediately since getGradeAndRemark uses currentConfig
-}
-
-function updateGradeComment(type, gradeKey, newComment) {
-    if (!newComment || !newComment.trim()) {
-        alert('Please enter a comment for the grade.');
-        populateGradeEditors();
-        return;
-    }
-    if (type === 'lower') {
-        currentConfig.gradeCommentsLower[gradeKey] = newComment.trim();
-    } else if (type === 'upper') {
-        currentConfig.gradeCommentsUpper[gradeKey] = newComment.trim();
-    }
-    console.log(`Grade comment updated: ${type} ${gradeKey} = ${newComment.trim()}`);
 }
 
 async function shareProgressReportOnWhatsApp() {
