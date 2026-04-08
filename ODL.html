@@ -157,16 +157,22 @@ function saveSelectedSubjectsToRepo() {
     /* Global Reset and Box Sizing */
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Body - SURGICAL FIX: Align to flex-start and enable scrolling to prevent chopping */
+    /* Body */
+    html, body {
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
     body {
         background: #1a2a6c;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        min-height: 100vh;
         padding: 20px;
-        overflow-y: auto;
     }
 
     /* --- Loading Indicator Styles --- */
@@ -216,7 +222,7 @@ function saveSelectedSubjectsToRepo() {
         100% { transform: rotate(360deg); }
     }
 
-    /* Page Container - SURGICAL FIX: Auto margins for horizontal centering and vertical space */
+    /* Page Container */
     .page {
         display: none;
         width: 95%;
@@ -228,7 +234,8 @@ function saveSelectedSubjectsToRepo() {
         margin: 20px auto;
         text-align: center;
         height: auto;
-        overflow-x: hidden; /* Prevent container level scroll */
+        overflow-x: hidden;
+        position: relative;
     }
 
     #initialPage { display: block; text-align: center; }
@@ -1700,7 +1707,7 @@ function generateHeadComment(form, student, average, passCount, totalSubjects, p
     const isLower = form === 'form1' || form === 'form2';
 
     if (!pass) {
-        return 'The student has not met the minimum requirements for progression. Parental support are strongly recommended.';
+        return 'The student has not met the minimum requirements for progression. Extra tuition and parental support are strongly recommended.';
     }
 
     let positionNote = '';
