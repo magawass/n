@@ -92,9 +92,14 @@ function updatePasswordAccessStatus() {
 
 function populateDataSubjectSelect() {
     const sel = document.getElementById('dataSubjectSelect');
+    const form = document.getElementById('dataClassSelect').value;
     if (!sel) return;
     sel.innerHTML = '<option value="">-- Select Subject --</option>';
     ALL_SUBJECTS.forEach(s => {
+        // --- SURGICAL FIX: Check Visibility ---
+        if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][s]) {
+            return; // Skip hidden subjects
+        }
         const opt = document.createElement('option');
         opt.value = s;
         opt.textContent = s;
@@ -152,16 +157,22 @@ function saveSelectedSubjectsToRepo() {
     /* Global Reset and Box Sizing */
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Body - SURGICAL FIX: Align to flex-start and enable scrolling to prevent chopping */
+    /* Body */
+    html, body {
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
     body {
         background: #1a2a6c;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        min-height: 100vh;
         padding: 20px;
-        overflow-y: auto;
     }
 
     /* --- Loading Indicator Styles --- */
@@ -211,7 +222,7 @@ function saveSelectedSubjectsToRepo() {
         100% { transform: rotate(360deg); }
     }
 
-    /* Page Container - SURGICAL FIX: Auto margins for horizontal centering and vertical space */
+    /* Page Container */
     .page {
         display: none;
         width: 95%;
@@ -223,7 +234,8 @@ function saveSelectedSubjectsToRepo() {
         margin: 20px auto;
         text-align: center;
         height: auto;
-        overflow-x: hidden; /* Prevent container level scroll */
+        overflow-x: hidden;
+        position: relative;
     }
 
     #initialPage { display: block; text-align: center; }
@@ -351,6 +363,10 @@ function saveSelectedSubjectsToRepo() {
 
     #resultsTable td:first-child, #gradesTable td:first-child, #scoresTable td:nth-child(2), #briefResultsTable td:first-child { text-align: left; }
     #resultsTable td:not(:first-child), #gradesTable td:not(:first-child), #scoresTable td:not(:nth-child(2)), #briefResultsTable td:not(:first-child) { text-align: center; }
+    /* SNE column (5th td) and Name column (3rd td) in mark/grade sheets left-align */
+    #scoresTable td:nth-child(3), #gradesTable td:nth-child(3) { text-align: left; }
+    /* Data entry table Name column (2nd td) left-aligned */
+    #dataEntryTable td:nth-child(2) { text-align: left; }
     #analysisTable td { text-align: center; }
 
     /* Progress Report Layout */
@@ -771,7 +787,7 @@ function saveSelectedSubjectsToRepo() {
 
     <header id="reportHeader" style="width: 100%;">
         <img 
-src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" alt="School Logo">
+src="https://raw.githubusercontent.com/magawass/n/main/logo.png" class="logo" alt="School Logo">
         <div id="reportHeaderCenter">
             <div style="font-family: 'Times New Roman', Times, serif;">
  <div style="text-align: center;">
@@ -876,7 +892,7 @@ src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" a
     <button onclick="openAdminHome()" style="position: absolute; top: 10px; left: 10px; width: auto; padding: 5px 10px; max-width: none !important; margin: 0;">Back</button>
 
     <label for="dataClassSelect">Select Class/Form</label>
-    <select id="dataClassSelect" onchange="checkAndAutoLoad()">
+    <select id="dataClassSelect" onchange="populateDataSubjectSelect()">
         <option value="">-- Select Class --</option>
         <option value="form1">Form 1</option>
         <option value="form2">Form 2</option>
@@ -905,6 +921,7 @@ src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" a
                         <th style="border:1px solid #cc6600;padding:10px;">Exam Number</th>
                         <th style="border:1px solid #cc6600;padding:10px;">Name</th>
                         <th style="border:1px solid #cc6600;padding:10px;width:40px;">SEX</th>
+                        <th style="border:1px solid #cc6600;padding:10px;width:30px;">SNE<br><span style="font-weight:normal;font-size:0.8em;">(SN)</span></th>
                         <th style="border:1px solid #cc6600;padding:10px;">Score</th>
                     </tr>
                 </thead>
@@ -966,6 +983,27 @@ src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" a
 
     <label for="feesInput">Fees (Amount):</label>
     <input type="text" id="feesInput" placeholder="e.g. MK 85,000">
+
+    <hr style="margin: 20px 0; border: 1px solid #eee;">
+    <!-- --- SURGICAL FIX: SUBJECT VISIBILITY --- -->
+    <h3>Subject Visibility Control</h3>
+    <p style="font-size: 0.9em; color: #7f8c8d;">Select a class and subject to hide/unhide from reports and data entry.</p>
+    
+    <label for="visibilityClassSelect">Select Class:</label>
+    <select id="visibilityClassSelect" onchange="updateVisibilityUI()">
+        <option value="form1">Form 1</option>
+        <option value="form2">Form 2</option>
+        <option value="form3">Form 3</option>
+        <option value="form4">Form 4</option>
+    </select>
+
+    <label for="visibilitySubjectSelect">Select Subject:</label>
+    <select id="visibilitySubjectSelect" onchange="updateVisibilityUI()"></select>
+
+    <div style="margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <input type="checkbox" id="hideSubjectCheckbox" onchange="toggleSubjectVisibility()" style="width: 20px; height: 20px; margin: 0;">
+        <label for="hideSubjectCheckbox" style="margin: 0; font-weight: bold;">Hide this subject from Portal & Entries</label>
+    </div>
 
     <hr style="margin: 20px 0; border: 1px solid #eee;">
     <h3>Assign Subject Teachers (Per Class)</h3>
@@ -1086,6 +1124,83 @@ src="https://raw.githubusercontent.com/magawass/n2/main/logo.png" class="logo" a
 <button onclick="togglePasswordAccess()" id="passwordAccessBtn">Toggle Password Access</button>
 <p id="passwordAccessStatus" style="font-size:11px; color:#2ecc71;"></p>
 
+<hr style="margin: 20px 0; border: 1px solid #ccc;">
+<h3>ARCHIVE SECTION</h3>
+<p style="font-size:0.9em; color:#7f8c8d; margin-bottom:10px;">Select class, year and term, then click to archive current exam data to the archive repository.</p>
+
+<label for="archiveClassSelect">Select Class:</label>
+<select id="archiveClassSelect">
+    <option value="">-- Select Class --</option>
+    <option value="form1">Form 1</option>
+    <option value="form2">Form 2</option>
+    <option value="form3">Form 3</option>
+    <option value="form4">Form 4</option>
+</select>
+
+<label for="archiveYearInput">Year:</label>
+<input type="text" id="archiveYearInput" placeholder="e.g. 2025">
+
+<label for="archiveTermSelect">Term:</label>
+<select id="archiveTermSelect">
+    <option value="1">Term 1</option>
+    <option value="2">Term 2</option>
+    <option value="3">Term 3</option>
+</select>
+
+<button onclick="archiveExamData()" style="background: #8e44ad;">Exam Archived</button>
+<p id="archiveStatus" style="font-size:11px;color:#8e44ad;"></p>
+
+<hr style="margin: 20px 0; border: 1px solid #ccc;">
+<h3>SEARCH ARCHIVED RESULTS</h3>
+<p style="font-size:0.9em; color:#7f8c8d; margin-bottom:10px;">Filter by any combination below, then click Search.</p>
+
+<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px;">
+    <select id="archiveSearchClass" style="max-width:120px;">
+        <option value="">Class</option>
+        <option value="form1">Form 1</option>
+        <option value="form2">Form 2</option>
+        <option value="form3">Form 3</option>
+        <option value="form4">Form 4</option>
+    </select>
+    <input type="text" id="archiveSearchYear" placeholder="Year (e.g. 2025)" style="max-width:120px;">
+    <select id="archiveSearchTerm" style="max-width:120px;">
+        <option value="">Term</option>
+        <option value="Term1">Term 1</option>
+        <option value="Term2">Term 2</option>
+        <option value="Term3">Term 3</option>
+    </select>
+    <input type="text" id="archiveSearchName" placeholder="Student Name..." style="max-width:160px;">
+    <button onclick="searchArchiveResults()" class="small-btn" style="background:#17a2b8;color:white;max-width:100px;padding:12px 10px;margin-top:0;">Search</button>
+</div>
+
+<div id="archiveSearchResults" class="table-wrapper" style="margin-top:10px;"></div>
+
+<div id="archiveStudentDetail" class="hidden" style="margin-top:15px;">
+    <div id="archiveDetailContent" style="background:white;border:3px double black;outline:3px double black;outline-offset:3px;padding:25px 20px;width:95%;max-width:650px;margin:0 auto;color:black;">
+        <div id="archiveStudentInfo" style="text-align:left;margin-bottom:10px;font-size:11pt;color:black;"></div>
+        <div class="table-wrapper">
+            <table id="archiveResultsTable" style="width:100%;border-collapse:collapse;border:1px solid black;font-size:9pt;">
+                <thead>
+                    <tr>
+                        <th style="border:1px solid black;padding:4px 3px;">SUBJECT</th>
+                        <th style="border:1px solid black;padding:4px 3px;">SCORE</th>
+                        <th style="border:1px solid black;padding:4px 3px;">GRADE</th>
+                        <th style="border:1px solid black;padding:4px 3px;">POSITION</th>
+                        <th style="border:1px solid black;padding:4px 3px;">STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="archiveResultsBody"></tbody>
+            </table>
+        </div>
+        <div id="archiveSummaryInfo" style="margin-top:10px;text-align:left;font-size:9pt;color:black;"></div>
+    </div>
+    <div style="display:flex;justify-content:center;gap:10px;margin-top:15px;">
+        <button onclick="printArchiveDetail()" class="small-btn" style="background:#17a2b8;color:white;max-width:150px;">Print Result</button>
+        <button onclick="saveArchiveDetailPdf()" class="small-btn" style="background:#17a2b8;color:white;max-width:150px;">Download PDF</button>
+        <button onclick="closeArchiveDetail()" class="small-btn" style="background:#e74c3c;color:white;max-width:150px;">Close</button>
+    </div>
+</div>
+
 </div>
 
 <div id="sheetsPage" class="page">
@@ -1182,15 +1297,18 @@ const SUBJECT_MAP = {
     "Biology": "Bio",
     "Chemistry": "Chem",
     "Chichewa": "Chich",
+    "Computer Studies": "Comp",
     "English": "Eng",
+    "French": "Fr",
     "Geography": "Geo",
     "History": "Hist",
+    "Home Economics": "H/Econ",
     "Mathematics": "Maths",
     "Physics": "Phys",
     "Social/Life": "S/Life"
 };
 const ALL_SUBJECTS = Object.keys(SUBJECT_MAP); // Full names used for internal logic
-const BASE_HEADERS = ["STUDENT'S NAME", "Exam Number", "Sex", "Date of Birth"];
+const BASE_HEADERS = ["STUDENT'S NAME", "Exam Number", "Sex", "Date of Birth", "SN"];
 const ALL_HEADERS = [...BASE_HEADERS, ...ALL_SUBJECTS];
 const ALL_CLASSES = ['form1', 'form2', 'form3', 'form4'];
 const DEFAULT_TEACHER = '-';
@@ -1251,6 +1369,11 @@ function computeBestSixAggregate(form, student) {
     let values = [];
 
     for (const subject of ALL_SUBJECTS) {
+        // --- SURGICAL FIX: Skip hidden subjects ---
+        if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][subject]) {
+            continue;
+        }
+        
         const score = student[subject];
         if (!score) continue;
         const grade = getGradeAndRemark(form, score).grade;
@@ -1283,6 +1406,11 @@ function computeFinalRemark(form, student) {
     function upperPass(g){ return parseInt(g) <= 8; }
 
     for (const subject of ALL_SUBJECTS) {
+        // --- SURGICAL FIX: Skip hidden subjects ---
+        if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][subject]) {
+            continue;
+        }
+
         const s = student[subject];
         if (!s) continue;
         const g = getGradeAndRemark(form, s).grade;
@@ -1377,10 +1505,13 @@ function getSubjectShortName(fullName) {
 
 function getDefaultConfig() {
     const teachers = {};
+    const hiddenSubjects = {};
     ALL_CLASSES.forEach(form => {
         teachers[form] = {};
+        hiddenSubjects[form] = {};
         ALL_SUBJECTS.forEach(subject => {
             teachers[form][subject] = DEFAULT_TEACHER;
+            hiddenSubjects[form][subject] = false;
         });
     });
     return {
@@ -1393,6 +1524,7 @@ function getDefaultConfig() {
         gradeKeyLower: GRADE_KEY_LOWER,
         gradeKeyUpper: GRADE_KEY_UPPER,
         teachers: teachers,
+        hiddenSubjects: hiddenSubjects,
         passwordEnabled: true
     };
 }
@@ -1527,6 +1659,11 @@ function isStudentPass(form, student) {
     function upperPass(g){ return parseInt(g) <= 8; }
 
     for (const subject of ALL_SUBJECTS) {
+        // --- SURGICAL FIX: Skip hidden subjects ---
+        if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][subject]) {
+            continue;
+        }
+
         const raw = student[subject];
         if (!raw) continue;
         const grade = getGradeAndRemark(form, raw).grade;
@@ -1703,6 +1840,11 @@ function printSheet(pageId) {
     }, 100);
 }
 
+function safeMsg(error) {
+    let msg = error.message || String(error);
+    return msg.replace(/https?:\/\/[^\s]+/g, '[connection error]');
+}
+
 async function commitFile(path, message, content, sha, token, method) {
     const url = `${API_BASE}${path}`;
     const headers = {
@@ -1733,7 +1875,7 @@ async function commitFile(path, message, content, sha, token, method) {
         return await response.json();
     } catch (error) {
         console.error('Commit/Delete Failed:', error);
-        alert(`Operation Failed: ${error.message}. Check your Authorization Code and repository access.`);
+        alert(`Operation Failed: ${safeMsg(error)}. Check your Authorization Code and repository access.`);
         return null;
     }
 }
@@ -1828,14 +1970,15 @@ async function fetchConfig(token) {
         currentConfig = {
             ...defaultConfig,
             ...content,
-            teachers: { ...defaultConfig.teachers, ...content.teachers }
+            teachers: { ...defaultConfig.teachers, ...content.teachers },
+            hiddenSubjects: content.hiddenSubjects || defaultConfig.hiddenSubjects // Load hidden state
         };
 
         return { config: currentConfig, sha: configSha };
 
     } catch (error) {
         console.error('Error fetching config:', error);
-        alert(`Error: ${error.message}`);
+        alert(`Error: ${safeMsg(error)}`);
         return { config: getDefaultConfig(), sha: null };
     } finally {
         hideLoading();
@@ -1865,6 +2008,7 @@ async function initializeConfig(token) {
 
     populateTeacherInputs();
     populateLockSubjects();
+    populateVisibilitySubjects(); // Populate the visibility control
 }
 
 async function handleSaveConfig() {
@@ -1886,6 +2030,7 @@ async function handleSaveConfig() {
         gradeKeyLower: currentConfig.gradeKeyLower,
         gradeKeyUpper: currentConfig.gradeKeyUpper,
         teachers: {},
+        hiddenSubjects: currentConfig.hiddenSubjects || {}, // Save hidden state
         passwordEnabled: currentConfig.passwordEnabled
     };
 
@@ -1907,7 +2052,7 @@ async function handleSaveConfig() {
     updateLoadingPercent(40);
 
     const jsonContent = JSON.stringify(newConfig, null, 2);
-    const base64Content = btoa(jsonContent);
+    const base64Content = btoa(unescape(encodeURIComponent(jsonContent))); // UTF-8 fix
     const commitMessage = `Update configuration: term ${newConfig.term}, ${new Date().toLocaleString()}`;
 
     const result = await commitFile(
@@ -1989,7 +2134,7 @@ async function uploadCSV() {
     } catch (error) {
         hideLoading();
         console.error('CSV Upload failed:', error);
-        alert(`CSV Upload Failed: ${error.message}`);
+        alert(`CSV Upload Failed: ${safeMsg(error)}`);
     }
 }
 
@@ -2027,7 +2172,7 @@ async function refreshFileList() {
 
     } catch (error) {
         console.error('Error fetching file list:', error);
-        alert(`Error fetching file list: ${error.message}`);
+        alert(`Error fetching file list: ${safeMsg(error)}`);
     } finally {
         hideLoading();
     }
@@ -2114,7 +2259,7 @@ async function submitAndSaveScores() {
             columns: ALL_HEADERS
         });
 
-        const base64Content = btoa(csvString);
+        const base64Content = btoa(unescape(encodeURIComponent(csvString))); // UTF-8 fix
         const commitMessage = `Update: ${form} - ${subject} (${new Date().toLocaleString()})`;
 
         const result = await commitFile(
@@ -2148,7 +2293,7 @@ async function submitAndSaveScores() {
     } catch (error) {
         hideLoading();
         console.error('Save failed:', error);
-        alert(`Failed to save scores: ${error.message}`);
+        alert(`Failed to save scores: ${safeMsg(error)}`);
     }
 }
 
@@ -2192,31 +2337,6 @@ async function deleteScore() {
     alert(`Score set to '-'. Click 'Save All Data' to save changes.`);
 }
 
-function populateTeacherInputs() {
-    const form = document.getElementById('classTeacherDropdown').value;
-    const panel = document.getElementById('teacherAssignmentPanel');
-    panel.innerHTML = '';
-
-    if (!form || !currentConfig || !currentConfig.teachers[form]) {
-        panel.innerHTML = '<p style="margin-top: 10px;">Configuration not loaded.</p>';
-        return;
-    }
-
-    const sortedSubjects = [...ALL_SUBJECTS].sort();
-
-    sortedSubjects.forEach(subject => {
-        const teacher = currentConfig.teachers[form][subject] || DEFAULT_TEACHER;
-        const shortName = getSubjectShortName(subject);
-
-        panel.innerHTML += `
-            <div class="teacher-input-group">
-                <label for="${form}_${shortName}">${subject}</label>
-                <input type="text" id="${form}_${shortName}" data-subject="${subject}" value="${teacher}">
-            </div>
-        `;
-    });
-}
-
 function backToInitialPage() {
     goToPage('initialPage');
     document.getElementById('adminPassword').value = '';
@@ -2252,12 +2372,511 @@ async function openUploadsAuth() {
         alert('You need Authorization Code.');
         return;
     }
+    const uploadPass = prompt('Enter password to access File Uploads:');
+    if (uploadPass !== 'exam00n') {
+        alert('Incorrect password. Access denied.');
+        return;
+    }
     await initializeConfig(token);
     await refreshFileList();
     populateGradeEditors();
     populateClearSubjectSelect();
     updatePasswordAccessStatus();
     goToPage('uploadsPage');
+}
+
+// --- ARCHIVE SECTION FUNCTIONS ---
+const ARCHIVE_REPO = 'n3';
+const ARCHIVE_API_BASE = `https://api.github.com/repos/${GITHUB_USER}/${ARCHIVE_REPO}/contents/`;
+
+async function archiveExamData() {
+    const token = document.getElementById('githubToken').value;
+    const form = document.getElementById('archiveClassSelect').value;
+    const year = document.getElementById('archiveYearInput').value.trim();
+    const term = document.getElementById('archiveTermSelect').value;
+    const statusEl = document.getElementById('archiveStatus');
+
+    if (!token) { alert('Please enter Authorization Code.'); return; }
+    if (!form) { alert('Please select a Class.'); return; }
+    if (!year) { alert('Please enter a Year.'); return; }
+
+    const confirmArchive = confirm(`Archive exam data for ${form.toUpperCase()} - Year ${year} - Term ${term}?\n\nThis will send a copy of the current data to the archive repository.`);
+    if (!confirmArchive) return;
+
+    statusEl.textContent = 'Archiving...';
+    statusEl.style.color = '#f39c12';
+
+    try {
+        showLoading();
+        updateLoadingPercent(10);
+
+        // Fetch current class data from memory or repo
+        const classData = await fetchClassData(form);
+        if (!classData || classData.length === 0) {
+            hideLoading();
+            statusEl.textContent = 'No student data found for ' + form + '.';
+            statusEl.style.color = '#e74c3c';
+            return;
+        }
+
+        updateLoadingPercent(40);
+
+        // Convert to CSV with archive metadata columns
+        const csvString = Papa.unparse(classData, { header: true, columns: ALL_HEADERS });
+
+        // Build the archive filename: e.g. form1_2025_Term1.csv
+        const archiveFileName = `${form}_${year}_Term${term}.csv`;
+        const base64Content = btoa(unescape(encodeURIComponent(csvString)));
+
+        updateLoadingPercent(60);
+
+        // Check if file already exists in archive repo
+        let existingSha = null;
+        try {
+            const checkResponse = await fetch(`${ARCHIVE_API_BASE}${archiveFileName}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (checkResponse.ok) {
+                const existingData = await checkResponse.json();
+                existingSha = existingData.sha;
+            }
+        } catch (e) { /* file doesn't exist yet, which is fine */ }
+
+        updateLoadingPercent(80);
+
+        // Commit to archive repo
+        const commitUrl = ARCHIVE_API_BASE + archiveFileName;
+        const commitBody = {
+            message: `Archive: ${form} - Year ${year} Term ${term} (${new Date().toLocaleString()})`,
+            content: base64Content,
+            branch: 'main'
+        };
+        if (existingSha) commitBody.sha = existingSha;
+
+        const commitResponse = await fetch(commitUrl, {
+            method: existingSha ? 'PUT' : 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(commitBody)
+        });
+
+        if (!commitResponse.ok) {
+            const errData = await commitResponse.json();
+            throw new Error(errData.message || 'Archive commit failed');
+        }
+
+        updateLoadingPercent(100);
+        hideLoading();
+
+        statusEl.textContent = `Successfully archived ${form} - ${year} Term ${term}!`;
+        statusEl.style.color = '#2ecc71';
+
+    } catch (error) {
+        hideLoading();
+        console.error('Archive failed:', error);
+        statusEl.textContent = 'Archive failed: ' + safeMsg(error);
+        statusEl.style.color = '#e74c3c';
+    }
+}
+
+// Global cache for archive data
+let archiveDataCache = {};
+
+async function searchArchiveResults() {
+    const filterClass = document.getElementById('archiveSearchClass').value;
+    const filterYear = document.getElementById('archiveSearchYear').value.trim();
+    const filterTerm = document.getElementById('archiveSearchTerm').value;
+    const filterName = document.getElementById('archiveSearchName').value.trim().toLowerCase();
+    const resultsDiv = document.getElementById('archiveSearchResults');
+
+    if (!filterClass && !filterYear && !filterTerm && !filterName) {
+        resultsDiv.innerHTML = '<p style="color:#e74c3c;">Please enter at least one filter.</p>';
+        return;
+    }
+
+    const token = document.getElementById('githubToken').value;
+    if (!token) {
+        resultsDiv.innerHTML = '<p style="color:#e74c3c;">Authorization Code required to search archives.</p>';
+        return;
+    }
+
+    resultsDiv.innerHTML = '<p style="color:#7f8c8d;">Searching archives...</p>';
+
+    try {
+        const response = await fetch(ARCHIVE_API_BASE, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            resultsDiv.innerHTML = '<p style="color:#e74c3c;">Failed to access archive repository.</p>';
+            return;
+        }
+
+        const files = await response.json();
+        const csvFiles = files.filter(f => f.name.endsWith('.csv'));
+
+        if (csvFiles.length === 0) {
+            resultsDiv.innerHTML = '<p style="color:#7f8c8d;">No archived files found.</p>';
+            return;
+        }
+
+        let matches = [];
+
+        for (const file of csvFiles) {
+            // Extract metadata from filename: e.g. form1_2025_Term1.csv
+            const parts = file.name.replace('.csv', '').split('_');
+            const fileForm = parts[0] || '';
+            const fileYear = parts[parts.length - 2] || '';
+            const fileTerm = parts[parts.length - 1] || '';
+
+            // Filter by filename metadata first
+            if (filterClass && fileForm !== filterClass) continue;
+            if (filterYear && fileYear !== filterYear) continue;
+            if (filterTerm && fileTerm !== filterTerm) continue;
+
+            // If only class/year/term filters (no name), still need to load to show students
+            // Fetch and parse CSV content
+            try {
+                if (!archiveDataCache[file.download_url]) {
+                    const csvResponse = await fetch(file.download_url);
+                    if (!csvResponse.ok) continue;
+                    const csvText = await csvResponse.text();
+                    const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+                    archiveDataCache[file.download_url] = parsed.data;
+                }
+
+                const students = archiveDataCache[file.download_url];
+                for (const student of students) {
+                    // If name filter is set, check it
+                    if (filterName) {
+                        const name = (student["STUDENT'S NAME"] || '').toLowerCase();
+                        if (!name.includes(filterName)) continue;
+                    }
+
+                    matches.push({
+                        name: student["STUDENT'S NAME"],
+                        examNo: student["Exam Number"],
+                        form: fileForm,
+                        year: fileYear,
+                        term: fileTerm,
+                        student: student,
+                        fileName: file.name,
+                        allStudents: students
+                    });
+
+                    if (matches.length >= 50) break;
+                }
+            } catch (e) {
+                /* skip files that fail to load */
+            }
+
+            if (matches.length >= 50) break;
+        }
+
+        if (matches.length === 0) {
+            resultsDiv.innerHTML = '<p style="color:#7f8c8d;">No results found for the given filters.</p>';
+            return;
+        }
+
+        let html = `<table style="width:100%;border-collapse:collapse;border:1px solid black;font-size:0.85em;">
+            <thead>
+                <tr style="background:#ecf0f1;">
+                    <th style="border:1px solid black;padding:6px;">Name</th>
+                    <th style="border:1px solid black;padding:6px;">Exam No</th>
+                    <th style="border:1px solid black;padding:6px;">Class</th>
+                    <th style="border:1px solid black;padding:6px;">Year</th>
+                    <th style="border:1px solid black;padding:6px;">Term</th>
+                    <th style="border:1px solid black;padding:6px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        matches.forEach((m, i) => {
+            html += `<tr>
+                <td style="border:1px solid black;padding:6px;text-align:left;">${m.name}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${m.examNo}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${m.form.toUpperCase().replace('FORM', 'Form ')}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${m.year}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${m.term}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">
+                    <button onclick="viewArchivedStudent(${i})" class="small-btn" style="background:#17a2b8;color:white;padding:4px 10px;font-size:0.8em;max-width:80px;">View</button>
+                </td>
+            </tr>`;
+        });
+
+        html += '</tbody></table>';
+        html += `<p style="font-size:0.8em;color:#7f8c8d;margin-top:5px;">Found ${matches.length} result${matches.length > 1 ? 's' : ''}. Showing up to 50.</p>`;
+
+        window._archiveMatches = matches;
+        resultsDiv.innerHTML = html;
+
+    } catch (error) {
+        console.error('Search failed:', error);
+        resultsDiv.innerHTML = '<p style="color:#e74c3c;">Search failed: ' + safeMsg(error) + '</p>';
+    }
+}
+
+function viewArchivedStudent(index) {
+    const match = window._archiveMatches[index];
+    if (!match) return;
+
+    const student = match.student;
+    const form = match.form;
+    const term = match.term.replace('Term', 'Term ');
+    const year = match.year;
+    const allStudents = match.allStudents;
+
+    // Populate student info line
+    document.getElementById('archiveStudentInfo').innerHTML = `
+        <strong>${student["STUDENT'S NAME"] || '-'}</strong>&nbsp;&nbsp;
+        Exam No: <strong>${student["Exam Number"] || '-'}</strong>&nbsp;&nbsp;
+        Sex: <strong>${student["Sex"] || '-'}</strong>&nbsp;&nbsp;
+        Class: <strong>${form.toUpperCase().replace('FORM', 'Form ')}</strong>&nbsp;&nbsp;
+        Term: <strong>${term}</strong>&nbsp;&nbsp;
+        Year: <strong>${year}</strong>
+    `;
+
+    // Compute subject positions from all students in the archived file
+    const subjectPositions = {};
+    ALL_SUBJECTS.forEach(sub => {
+        const scores = [];
+        allStudents.forEach(s => {
+            const raw = s[sub];
+            if (raw !== undefined && raw !== null && raw.toString().trim() !== '' && !isNaN(parseInt(raw))) {
+                scores.push({ score: parseInt(raw), examNo: s["Exam Number"] });
+            }
+        });
+        scores.sort((a, b) => b.score - a.score);
+        subjectPositions[sub] = {};
+        scores.forEach((item, i) => {
+            if (i === 0) {
+                subjectPositions[sub][item.examNo] = 1;
+            } else if (item.score === scores[i - 1].score) {
+                subjectPositions[sub][item.examNo] = subjectPositions[sub][scores[i - 1].examNo];
+            } else {
+                subjectPositions[sub][item.examNo] = i + 1;
+            }
+        });
+    });
+
+    const isLowerForm = form === 'form1' || form === 'form2';
+    const studentExamNo = student["Exam Number"];
+
+    // Build results table body
+    const tbody = document.getElementById('archiveResultsBody');
+    tbody.innerHTML = '';
+
+    let passCount = 0;
+    let subjectCount = 0;
+
+    ALL_SUBJECTS.forEach(sub => {
+        const rawScore = student[sub];
+        if (rawScore === undefined || rawScore === null || rawScore.toString().trim() === '') return;
+
+        const score = parseInt(rawScore);
+        let grade = '-';
+        let position = '-';
+        let status = '-';
+
+        if (!isNaN(score)) {
+            const gr = getGradeAndRemark(form, score);
+            grade = gr.grade;
+            subjectCount++;
+
+            // Position
+            if (subjectPositions[sub] && subjectPositions[sub][studentExamNo] !== undefined) {
+                position = subjectPositions[sub][studentExamNo];
+            }
+
+            // Pass/Fail per subject
+            if (isLowerForm) {
+                status = ['A', 'B', 'C', 'D'].includes(grade) ? 'Pass' : 'Fail';
+            } else {
+                status = ['1', '2', '3', '4', '5', '6', '7', '8'].includes(grade) ? 'Pass' : 'Fail';
+            }
+
+            if (status === 'Pass') passCount++;
+        }
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="border:1px solid black;padding:4px 3px;text-align:left;">${sub}</td>
+            <td style="border:1px solid black;padding:4px 3px;text-align:center;">${rawScore}</td>
+            <td style="border:1px solid black;padding:4px 3px;text-align:center;">${grade}</td>
+            <td style="border:1px solid black;padding:4px 3px;text-align:center;">${position}</td>
+            <td style="border:1px solid black;padding:4px 3px;text-align:center;color:${status === 'Pass' ? 'green' : (status === 'Fail' ? 'red' : 'black')};font-weight:bold;">${status}</td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    // Overall pass/fail: same logic as main system (6+ subject passes)
+    const overallStatus = subjectCount >= 4 ? (passCount >= 6 ? 'Pass' : 'Fail') : '-';
+    const statusColor = overallStatus === 'Pass' ? 'green' : (overallStatus === 'Fail' ? 'red' : 'black');
+
+    // --- SURGICAL FIX: Compute Best 6, Aggregate, Position in Class ---
+    // Collect all numeric scores with their grade values for ranking
+    let allScoresWithGrades = [];
+    ALL_SUBJECTS.forEach(sub => {
+        const raw = student[sub];
+        if (raw && !isNaN(parseInt(raw))) {
+            const gr = getGradeAndRemark(form, parseInt(raw));
+            allScoresWithGrades.push({ subject: sub, score: parseInt(raw), grade: gr.grade });
+        }
+    });
+
+    // Best 6 total (sum of top 6 raw scores)
+    const sortedByScore = [...allScoresWithGrades].sort((a, b) => b.score - a.score);
+    const best6Scores = sortedByScore.slice(0, 6);
+    const best6Total = best6Scores.reduce((s, x) => s + x.score, 0);
+
+    // Average of best 6
+    const avgBest6 = best6Scores.length > 0 ? (best6Total / best6Scores.length).toFixed(1) : '0.0';
+
+    // Aggregate for upper forms (sum of best 6 grade numbers)
+    let gradeValues = allScoresWithGrades.map(x => x.grade).filter(g => !isNaN(parseInt(g))).map(g => parseInt(g));
+    gradeValues.sort((a, b) => a - b);
+    const aggregate = gradeValues.length >= 6 ? gradeValues.slice(0, 6).reduce((s, v) => s + v, 0) : '-';
+
+    // Position in class: compute aggregate for all students and rank
+    let allStudentAggregates = [];
+    allStudents.forEach(s => {
+        let vals = [];
+        ALL_SUBJECTS.forEach(sub => {
+            const raw = s[sub];
+            if (raw && !isNaN(parseInt(raw))) {
+                const gr = getGradeAndRemark(form, parseInt(raw));
+                if (!isNaN(parseInt(gr.grade))) vals.push(parseInt(gr.grade));
+                else vals.push(gr.grade === '-' ? 99 : (['A','B','C','D','F'].indexOf(gr.grade) >= 0 ? ['A','B','C','D','F'].indexOf(gr.grade) : 99));
+            }
+        });
+        if (isLowerForm) {
+            // Lower forms: rank by sum of best 6 raw scores
+            let sc = [];
+            ALL_SUBJECTS.forEach(sub => {
+                const raw = s[sub];
+                if (raw && !isNaN(parseInt(raw))) sc.push(parseInt(raw));
+            });
+            sc.sort((a, b) => b - a);
+            const b6 = sc.slice(0, 6).reduce((x, y) => x + y, 0);
+            allStudentAggregates.push({ examNo: s["Exam Number"], agg: b6 });
+        } else {
+            // Upper forms: rank by sum of best 6 grade numbers (lower is better)
+            let gv = [];
+            ALL_SUBJECTS.forEach(sub => {
+                const raw = s[sub];
+                if (raw && !isNaN(parseInt(raw))) {
+                    const gr = getGradeAndRemark(form, parseInt(raw));
+                    if (!isNaN(parseInt(gr.grade))) gv.push(parseInt(gr.grade));
+                }
+            });
+            gv.sort((a, b) => a - b);
+            const ag = gv.length >= 6 ? gv.slice(0, 6).reduce((x, y) => x + y, 0) : 999;
+            allStudentAggregates.push({ examNo: s["Exam Number"], agg: ag });
+        }
+    });
+
+    // Sort and assign positions (tied = same position)
+    if (isLowerForm) {
+        allStudentAggregates.sort((a, b) => b.agg - a.agg); // Higher total = better
+    } else {
+        allStudentAggregates.sort((a, b) => a.agg - b.agg); // Lower aggregate = better
+    }
+    let lastAgg = null, lastPos = 0;
+    allStudentAggregates.forEach((item, i) => {
+        const pos = (item.agg === lastAgg) ? lastPos : i + 1;
+        item.position = pos;
+        lastAgg = item.agg;
+        lastPos = pos;
+    });
+    const studentRank = allStudentAggregates.find(x => x.examNo === studentExamNo);
+    const positionInClass = studentRank ? studentRank.position : '-';
+
+    // Build summary based on form type
+    let summaryHTML = '';
+    if (isLowerForm) {
+        summaryHTML = `
+            <div style="margin-top:10px;text-align:left;font-size:9pt;color:black;line-height:1.8;">
+                <div>Total (Best 6): <strong>${best6Total}</strong>&nbsp;&nbsp;&nbsp;&nbsp;Average: <strong>${avgBest6}</strong>&nbsp;&nbsp;&nbsp;&nbsp;Position in Class: <strong>${positionInClass}</strong>&nbsp;&nbsp;&nbsp;&nbsp;Status: <strong style="color:${statusColor};">${overallStatus}</strong></div>
+            </div>
+        `;
+    } else {
+        summaryHTML = `
+            <div style="margin-top:10px;text-align:left;font-size:9pt;color:black;line-height:1.8;">
+                <div>Aggregate: <strong>${aggregate}</strong>&nbsp;&nbsp;&nbsp;&nbsp;Position in Class: <strong>${positionInClass}</strong>&nbsp;&nbsp;&nbsp;&nbsp;Status: <strong style="color:${statusColor};">${overallStatus}</strong></div>
+            </div>
+        `;
+    }
+    document.getElementById('archiveSummaryInfo').innerHTML = summaryHTML;
+
+    document.getElementById('archiveStudentDetail').classList.remove('hidden');
+    window._currentArchiveMatch = match;
+}
+
+function closeArchiveDetail() {
+    document.getElementById('archiveStudentDetail').classList.add('hidden');
+}
+
+function printArchiveDetail() {
+    const detailContent = document.getElementById('archiveDetailContent');
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Archived Result - Print</title>
+            <style>
+                body { margin: 0; padding: 15px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+                table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+                th, td { border: 1px solid black; padding: 4px 3px; }
+                th { background: #ecf0f1; color: #2c3e50; font-weight: 600; text-align: center; }
+                @page { size: A4 portrait; margin: 1cm; }
+            </style>
+        </head>
+        <body>${detailContent.innerHTML}</body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => { printWindow.print(); }, 500);
+}
+
+function saveArchiveDetailPdf() {
+    const detailContent = document.getElementById('archiveDetailContent');
+
+    showLoading();
+    updateLoadingPercent(10);
+
+    html2canvas(detailContent, {
+        scale: 2,
+        allowTaint: true,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+    }).then(canvas => {
+        updateLoadingPercent(50);
+        const { jsPDF } = window.jspdf;
+        const imgData = canvas.toDataURL('image/png');
+
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'px',
+            format: [canvas.width, canvas.height]
+        });
+
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+
+        updateLoadingPercent(90);
+        const studentName = window._currentArchiveMatch ? window._currentArchiveMatch.name : 'Student';
+        pdf.save(`${studentName.replace(/ /g, '_')}_Archived_Result.pdf`);
+
+        updateLoadingPercent(100);
+        hideLoading();
+    }).catch(err => {
+        hideLoading();
+        alert('PDF generation failed: ' + err.message);
+    });
 }
 
 
@@ -2360,6 +2979,11 @@ async function loadResults(isStudentPortal) {
         const sortedSubjects = [...ALL_SUBJECTS].sort();
 
         sortedSubjects.forEach(subject => {
+            // --- SURGICAL FIX: Skip hidden subjects ---
+            if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][subject]) {
+                return; 
+            }
+
             const rawScore = student[subject];
             let displayScore = '-';
             let grade = '-';
@@ -2395,7 +3019,7 @@ async function loadResults(isStudentPortal) {
         const lastRow = reportBody.insertRow();
         const labelCell = lastRow.insertCell();
         labelCell.style.fontWeight = 'bold';
-        labelCell.textContent = isUpper ? 'AGGREGATE' : 'AVERAGE';
+        labelCell.textContent = isUpper ? 'AGGREGATE' : 'AVERAGE (BEST 6)';
         // SCORE column
         if (isUpper) {
             lastRow.insertCell(); // empty SCORE cell
@@ -2586,6 +3210,11 @@ async function loadBriefResults() {
     const sortedSubjects = [...ALL_SUBJECTS].sort();
 
     sortedSubjects.forEach(subject => {
+        // --- SURGICAL FIX: Skip hidden subjects ---
+        if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][subject]) {
+            return;
+        }
+
         const rawScore = student[subject];
         let displayScore = '-';
         let grade = '-';
@@ -2645,8 +3274,14 @@ async function calculateStudentMetrics(student, form){
 
     const sortedSubjects = [...ALL_SUBJECTS].sort();
 
-    const gradeNums = []; 
+    const gradeNums = [];
+    const allNumericScores = [];
     for (const subject of sortedSubjects) {
+        // --- SURGICAL FIX: Skip hidden subjects from calculations ---
+        if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][subject]) {
+            continue;
+        }
+
         const rawScore = student[subject];
 
         if (rawScore === undefined || rawScore === null || rawScore === '') {
@@ -2660,7 +3295,7 @@ async function calculateStudentMetrics(student, form){
 
         const score = parseInt(rawScore);
         if (!isNaN(score) && isFinite(score)) {
-            totalScore += score;
+            allNumericScores.push(score);
             subjectsCount++;
 
             if (form === 'form3' || form === 'form4') {
@@ -2679,11 +3314,22 @@ async function calculateStudentMetrics(student, form){
         rankable = false;
     }
 
+    // For Forms 1 and 2: average and total are based on the best 6 subject scores
+    let avgDenominator = subjectsCount;
+    if (form === 'form1' || form === 'form2') {
+        allNumericScores.sort(function(a, b) { return b - a; }); // highest first
+        avgDenominator = Math.min(6, allNumericScores.length);
+        var bestScores = allNumericScores.slice(0, avgDenominator);
+        totalScore = bestScores.reduce(function(a, b) { return a + b; }, 0);
+    } else {
+        totalScore = allNumericScores.reduce(function(a, b) { return a + b; }, 0);
+    }
+
     let aggregate = '-';
     if (form === 'form3' || form === 'form4') {
         if (gradeNums.length >= 6) {
-            gradeNums.sort((a,b)=>a-b); 
-            aggregate = gradeNums.slice(0,6).reduce((a,b)=>a+b,0);
+            gradeNums.sort(function(a,b){return a-b;});
+            aggregate = gradeNums.slice(0,6).reduce(function(a,b){return a+b;},0);
         } else {
             aggregate = '-';
         }
@@ -2708,7 +3354,7 @@ async function calculateStudentMetrics(student, form){
         overallRemark = '-';
     }
 
-    const average = subjectsCount > 0 ? totalScore / subjectsCount : 0;
+    const average = avgDenominator > 0 ? totalScore / avgDenominator : 0;
 
     return {
         totalScore: totalScore,
@@ -2737,11 +3383,7 @@ function openAnalysisSelector() {
 
 function openDataEntryPage() {
     goToPage('dataEntryPage');
-    const dataSubjectSelect = document.getElementById('dataSubjectSelect');
-    dataSubjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
-    ALL_SUBJECTS.forEach(subject => {
-        dataSubjectSelect.innerHTML += `<option value="${subject}">${subject}</option>`;
-    });
+    populateDataSubjectSelect(); // Filter subjects when opening data entry
 }
 
 function openScoreSheetView() {
@@ -2785,8 +3427,12 @@ async function displayScoreSheet() {
 
     const isLowerForm = form === 'form1' || form === 'form2';
 
-    let html = '<table id="scoresTable"><thead><tr><th style="width:5%;">POS</th><th style="width:10%;">Exam No</th><th style="width:20%;">Name</th><th style="width:5%;">SEX</th>';
-    ALL_SUBJECTS.forEach(sub => { html += `<th>${getSubjectShortName(sub)}</th>`; });
+    let html = '<table id="scoresTable"><thead><tr><th style="width:5%;">POS</th><th style="width:10%;">Exam No</th><th style="width:15%;">Name</th><th style="width:5%;">SEX</th><th style="width:5%;">SNE<br><span style="font-weight:normal;font-size:0.8em;">(SN)</span></th>';
+    ALL_SUBJECTS.forEach(sub => { 
+        // --- SURGICAL FIX: Skip hidden subjects ---
+        if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][sub]) return;
+        html += `<th>${getSubjectShortName(sub)}</th>`; 
+    });
     if (isLowerForm) {
         html += '<th>Total</th>';
     }
@@ -2811,9 +3457,12 @@ async function displayScoreSheet() {
         lastPos = pos;
 
         let totalScore = 0;
-        let rowHtml = `<tr><td>${pos}</td><td>${student["Exam Number"]}</td><td>${student["STUDENT'S NAME"]}</td><td>${student["Sex"] || '-'}</td>`;
+        let rowHtml = `<tr><td>${pos}</td><td>${student["Exam Number"]}</td><td style="text-align:left;">${student["STUDENT'S NAME"]}</td><td>${student["Sex"] || '-'}</td><td>${student["SN"] || ''}</td>`;
 
         ALL_SUBJECTS.forEach(sub => {
+            // --- SURGICAL FIX: Skip hidden subjects ---
+            if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][sub]) return;
+
             const rawScore = student[sub] || '-';
             if (!isNaN(parseInt(rawScore)) && rawScore !== 'N' && rawScore !== 'X' && rawScore !== '-') {
                 totalScore += parseInt(rawScore);
@@ -2848,10 +3497,14 @@ async function displayGradesSheet() {
     document.getElementById('gradeSheetTerm').textContent = currentConfig ? currentConfig.term : '-';
 
     const isUpperForm = form === 'form3' || form === 'form4';
-    const finalColHeader = isUpperForm ? 'Aggregate' : 'Total Score';
+    const finalColHeader = isUpperForm ? 'Aggregate' : 'Total';
 
-    let html = `<table id="gradesTable"><thead><tr><th style="width:5%;">POS</th><th style="width:10%;">Exam No</th><th style="width:18%;">Name</th><th style="width:5%;">SEX</th>`;
-    ALL_SUBJECTS.forEach(sub => { html += `<th>${getSubjectShortName(sub)}</th>`; });
+    let html = `<table id="gradesTable"><thead><tr><th style="width:5%;">POS</th><th style="width:10%;">Exam No</th><th style="width:15%;">Name</th><th style="width:5%;">SEX</th><th style="width:5%;">SNE<br><span style="font-weight:normal;font-size:0.8em;">(SN)</span></th>`;
+    ALL_SUBJECTS.forEach(sub => { 
+        // --- SURGICAL FIX: Skip hidden subjects ---
+        if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][sub]) return;
+        html += `<th>${getSubjectShortName(sub)}</th>`; 
+    });
     html += `<th>${finalColHeader}</th><th>Remark</th></tr></thead><tbody>`;
 
     const studentsWithMetrics = [];
@@ -2886,9 +3539,12 @@ async function displayGradesSheet() {
     studentsWithMetrics.forEach(({ student, metrics }) => {
         const position = student.__position;
 
-        let rowHtml = `<tr><td>${position}</td><td>${student["Exam Number"]}</td><td>${student["STUDENT'S NAME"]}</td><td>${student["Sex"] || '-'}</td>`;
+        let rowHtml = `<tr><td>${position}</td><td>${student["Exam Number"]}</td><td style="text-align:left;">${student["STUDENT'S NAME"]}</td><td>${student["Sex"] || '-'}</td><td>${student["SN"] || ''}</td>`;
 
         ALL_SUBJECTS.forEach(sub => {
+            // --- SURGICAL FIX: Skip hidden subjects ---
+            if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][sub]) return;
+
             const rawScore = student[sub];
             let grade = '-';
             if (rawScore !== undefined && rawScore !== null && rawScore.toString().trim() !== '') {
@@ -2955,6 +3611,10 @@ async function displayAnalysisSheet(form) {
     let boysStats = { entered: 0, pass: 0, fail: 0 };
     let girlsStats = { entered: 0, pass: 0, fail: 0 };
 
+    // Track SNE (Special Needs Education) student statistics
+    let sneBoysStats = { entered: 0, pass: 0, fail: 0 };
+    let sneGirlsStats = { entered: 0, pass: 0, fail: 0 };
+
     data.forEach(student => {
         const studentSex = (student["Sex"] || '').toString().toUpperCase();
         const studentMetrics = { entered: false, passed: false };
@@ -2962,6 +3622,9 @@ async function displayAnalysisSheet(form) {
         let subjectCount = 0;
 
         ALL_SUBJECTS.forEach(sub => {
+            // --- SURGICAL FIX: Skip hidden subjects ---
+            if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][sub]) return;
+
             const rawScore = student[sub];
             const numericScore = parseInt(rawScore);
 
@@ -3000,6 +3663,20 @@ async function displayAnalysisSheet(form) {
                 if (studentMetrics.passed) girlsStats.pass++;
                 else girlsStats.fail++;
             }
+
+            // SNE student tracking (only for students with SN value)
+            const isSNE = student["SN"] && student["SN"].toString().trim() !== '';
+            if (isSNE) {
+                if (studentSex === 'M' || studentSex === 'Y') {
+                    sneBoysStats.entered++;
+                    if (studentMetrics.passed) sneBoysStats.pass++;
+                    else sneBoysStats.fail++;
+                } else if (studentSex === 'F') {
+                    sneGirlsStats.entered++;
+                    if (studentMetrics.passed) sneGirlsStats.pass++;
+                    else sneGirlsStats.fail++;
+                }
+            }
         }
     });
 
@@ -3010,6 +3687,9 @@ async function displayAnalysisSheet(form) {
     const sortedSubjects = [...ALL_SUBJECTS].sort();
 
     sortedSubjects.forEach(sub => {
+        // --- SURGICAL FIX: Skip hidden subjects ---
+        if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][sub]) return;
+
         const metrics = subjectMetrics[sub];
         if (metrics.entries > 0) {
             let rowHtml = `<tr><td>${sub}</td>`;
@@ -3040,7 +3720,8 @@ async function displayAnalysisSheet(form) {
     const totalFailPercent = totalEntered > 0 ? ((totalFail / totalEntered) * 100).toFixed(1) : '0.0';
 
     html += `
-    <table id="analysisSummaryTable" style="width:50%;border-collapse:collapse;margin-top:15px;border:1px solid black;">
+    <div style="display:flex;gap:10px;margin-top:15px;width:100%;">
+    <table id="analysisSummaryTable" style="width:50%;border-collapse:collapse;border:1px solid black;">
         <thead>
             <tr style="background:#ecf0f1;">
                 <th style="border:1px solid black;padding:6px;width:15%;"></th>
@@ -3077,7 +3758,46 @@ async function displayAnalysisSheet(form) {
                 <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${totalFailPercent}%</td>
             </tr>
         </tbody>
-    </table>`;
+    </table>
+    <table id="analysisSNETable" style="width:50%;border-collapse:collapse;border:1px solid black;">
+        <thead>
+            <tr style="background:#ecf0f1;">
+                <th style="border:1px solid black;padding:6px;width:15%;"></th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Entered</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Pass</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Pass%</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Fail</th>
+                <th style="border:1px solid black;padding:6px;text-align:center;">Fail%</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="border:1px solid black;padding:6px;font-weight:bold;">BOYS(M)</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${sneBoysStats.entered}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${sneBoysStats.pass}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${sneBoysStats.entered > 0 ? ((sneBoysStats.pass / sneBoysStats.entered) * 100).toFixed(1) : '0.0'}%</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${sneBoysStats.fail}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${sneBoysStats.entered > 0 ? ((sneBoysStats.fail / sneBoysStats.entered) * 100).toFixed(1) : '0.0'}%</td>
+            </tr>
+            <tr>
+                <td style="border:1px solid black;padding:6px;font-weight:bold;">GIRLS(F)</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${sneGirlsStats.entered}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${sneGirlsStats.pass}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${sneGirlsStats.entered > 0 ? ((sneGirlsStats.pass / sneGirlsStats.entered) * 100).toFixed(1) : '0.0'}%</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${sneGirlsStats.fail}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;">${sneGirlsStats.entered > 0 ? ((sneGirlsStats.fail / sneGirlsStats.entered) * 100).toFixed(1) : '0.0'}%</td>
+            </tr>
+            <tr style="background:#f0f0f0;">
+                <td style="border:1px solid black;padding:6px;font-weight:bold;">SNE TOTAL</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${sneBoysStats.entered + sneGirlsStats.entered}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${sneBoysStats.pass + sneGirlsStats.pass}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${(sneBoysStats.entered + sneGirlsStats.entered) > 0 ? (((sneBoysStats.pass + sneGirlsStats.pass) / (sneBoysStats.entered + sneGirlsStats.entered)) * 100).toFixed(1) : '0.0'}%</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${sneBoysStats.fail + sneGirlsStats.fail}</td>
+                <td style="border:1px solid black;padding:6px;text-align:center;font-weight:bold;">${(sneBoysStats.entered + sneGirlsStats.entered) > 0 ? (((sneBoysStats.fail + sneGirlsStats.fail) / (sneBoysStats.entered + sneGirlsStats.entered)) * 100).toFixed(1) : '0.0'}%</td>
+            </tr>
+        </tbody>
+    </table>
+    </div>`;
 
     wrapper.innerHTML = html;
 }
@@ -3137,11 +3857,20 @@ async function showStudentMarksList() {
         const sex = s["Sex"] || '-';
         const val = s[subject] || '';
         
+        const snVal = s["SN"] || '';
         const row = document.createElement('tr');
         row.innerHTML = `
             <td style="border:1px solid #cc6600;padding:8px;text-align:center;">${examNo}</td>
-            <td style="border:1px solid #cc6600;padding:8px;">${name}</td>
+            <td style="border:1px solid #cc6600;padding:8px;text-align:left;">${name}</td>
             <td style="border:1px solid #cc6600;padding:8px;text-align:center;width:40px;">${sex}</td>
+            <td style="border:1px solid #cc6600;padding:8px;text-align:center;width:30px;">
+                <input type="text" 
+                       id="sn_${i}" 
+                       value="${snVal}" 
+                       oninput="updateStudentSN('${form}', ${i}, this.value)"
+                       style="width:35px;padding:4px;text-align:center;border:1px solid #cc6600;border-radius:4px;font-size:0.85em;"
+                       placeholder=" ">
+            </td>
             <td style="border:1px solid #cc6600;padding:8px;text-align:center;">
                 <input type="text" 
                        id="score_${i}" 
@@ -3164,6 +3893,12 @@ function updateStudentScore(form, index, subject, value) {
         if (monitorSelect && monitorSelect.value === form) {
             refreshSubjectMonitor(form);
         }
+    }
+}
+
+function updateStudentSN(form, index, value) {
+    if (currentClassData[form] && currentClassData[form][index]) {
+        currentClassData[form][index]["SN"] = value.trim();
     }
 }
 
@@ -3253,6 +3988,11 @@ async function generateAllProgressReports() {
         reportBody.innerHTML = '';
 
         [...ALL_SUBJECTS].sort().forEach(subject => {
+            // --- SURGICAL FIX: Skip hidden subjects ---
+            if (currentConfig && currentConfig.hiddenSubjects && currentConfig.hiddenSubjects[form] && currentConfig.hiddenSubjects[form][subject]) {
+                return;
+            }
+
             const rawScore = student[subject];
             const gr = getGradeAndRemark(form, rawScore);
             const pos = subjectPositions[subject][studentNumber] || '-';
@@ -3273,7 +4013,7 @@ async function generateAllProgressReports() {
         const lastRow = reportBody.insertRow();
         const labelCell = lastRow.insertCell();
         labelCell.style.fontWeight = 'bold';
-        labelCell.textContent = isUpperForm ? 'AGGREGATE' : 'AVERAGE';
+        labelCell.textContent = isUpperForm ? 'AGGREGATE' : 'AVERAGE (BEST 6)';
         // SCORE column
         if (isUpperForm) {
             lastRow.insertCell(); // empty SCORE cell
@@ -3490,7 +4230,7 @@ async function addStudentManually() {
         updateLoadingPercent(60);
 
         const csvString = Papa.unparse(classData, { header: true, columns: ALL_HEADERS });
-        const base64Content = btoa(csvString);
+        const base64Content = btoa(unescape(encodeURIComponent(csvString))); // UTF-8 fix
         const commitMessage = `Added student: ${name} (${examNo}) to ${form}`;
 
         const result = await commitFile(fileName, commitMessage, base64Content, currentSha, token, 'PUT');
@@ -3508,7 +4248,7 @@ async function addStudentManually() {
     } catch (error) {
         hideLoading();
         console.error('Manual add failed:', error);
-        alert(`Failed to add student: ${error.message}`);
+        alert(`Failed to add student: ${safeMsg(error)}`);
     }
 }
 </script>
@@ -3564,7 +4304,7 @@ function populateTeacherInputs() {
 </script>
 
 <script>
-// --- SURGICAL FIX: Grade Range Editor and WhatsApp Share ---
+// --- SURGICAL FIX: Grade Range Editor and Visibility Control ---
 function populateGradeEditors() {
     if (!currentConfig) {
         console.warn('Config not loaded for grade editors');
@@ -3625,7 +4365,49 @@ function updateGradeRange(type, gradeKey, newValue) {
         currentConfig.gradeKeyUpper[gradeKey] = val;
     }
     console.log(`Grade range updated: ${type} ${gradeKey} = ${val}`);
-    // Changes reflect immediately since getGradeAndRemark uses currentConfig
+}
+
+// --- SURGICAL FIX: SUBJECT VISIBILITY LOGIC ---
+function populateVisibilitySubjects() {
+    const sel = document.getElementById('visibilitySubjectSelect');
+    if (!sel) return;
+    sel.innerHTML = '';
+    ALL_SUBJECTS.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        sel.appendChild(opt);
+    });
+    updateVisibilityUI();
+}
+
+function updateVisibilityUI() {
+    const form = document.getElementById('visibilityClassSelect').value;
+    const subject = document.getElementById('visibilitySubjectSelect').value;
+    const checkbox = document.getElementById('hideSubjectCheckbox');
+
+    if (!form || !subject || !currentConfig) return;
+
+    if (!currentConfig.hiddenSubjects) currentConfig.hiddenSubjects = {};
+    if (!currentConfig.hiddenSubjects[form]) currentConfig.hiddenSubjects[form] = {};
+
+    checkbox.checked = currentConfig.hiddenSubjects[form][subject] === true;
+}
+
+function toggleSubjectVisibility() {
+    const form = document.getElementById('visibilityClassSelect').value;
+    const subject = document.getElementById('visibilitySubjectSelect').value;
+    const checkbox = document.getElementById('hideSubjectCheckbox');
+
+    if (!form || !subject || !currentConfig) return;
+
+    if (!currentConfig.hiddenSubjects) currentConfig.hiddenSubjects = {};
+    if (!currentConfig.hiddenSubjects[form]) currentConfig.hiddenSubjects[form] = {};
+
+    currentConfig.hiddenSubjects[form][subject] = checkbox.checked;
+    
+    // Alert user changes take effect after saving config
+    console.log(`Visibility Toggled: ${form} - ${subject} is now ${checkbox.checked ? 'HIDDEN' : 'VISIBLE'}`);
 }
 
 async function shareProgressReportOnWhatsApp() {
@@ -3757,7 +4539,7 @@ async function clearScoresForClass() {
         updateLoadingPercent(70);
 
         const csvString = Papa.unparse(classData, { header: true, columns: ALL_HEADERS });
-        const base64Content = btoa(csvString);
+        const base64Content = btoa(unescape(encodeURIComponent(csvString))); // UTF-8 fix
         const commitMessage = subject 
             ? `Cleared ${subject} scores for ${form}` 
             : `Cleared all scores for ${form}`;
@@ -3772,7 +4554,7 @@ async function clearScoresForClass() {
     } catch (error) {
         hideLoading();
         console.error('Clear scores failed:', error);
-        alert(`Failed to clear scores: ${error.message}`);
+        alert(`Failed to clear scores: ${safeMsg(error)}`);
     }
 }
 
@@ -3817,7 +4599,7 @@ async function overwriteStudentData() {
         updateLoadingPercent(70);
 
         const csvString = Papa.unparse(classData, { header: true, columns: ALL_HEADERS });
-        const base64Content = btoa(csvString);
+        const base64Content = btoa(unescape(encodeURIComponent(csvString))); // UTF-8 fix
         const commitMessage = `Updated student data for ${examNo} in ${form}`;
 
         const result = await commitFile(fileName, commitMessage, base64Content, currentSha, token, 'PUT');
@@ -3835,7 +4617,7 @@ async function overwriteStudentData() {
     } catch (error) {
         hideLoading();
         console.error('Overwrite failed:', error);
-        alert(`Failed to update student: ${error.message}`);
+        alert(`Failed to update student: ${safeMsg(error)}`);
     }
 }
 </script>
